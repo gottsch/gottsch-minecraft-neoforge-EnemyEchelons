@@ -105,7 +105,7 @@ public class EEchelons {
 	 * @param event
 	 */
 	private void config(final ModConfigEvent event) {
-		if (event.getConfig().getModId().equals(MODID)) {
+		if (event.getConfig().getModId().equals(MODID) && !(event instanceof ModConfigEvent.Unloading)) {
 			if (event.getConfig().getType() == ModConfig.Type.SERVER) {
 				IConfigSpec spec = event.getConfig().getSpec();
 				// get the toml config data

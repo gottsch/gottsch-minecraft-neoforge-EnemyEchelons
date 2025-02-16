@@ -24,6 +24,7 @@ import mod.gottsch.neoforge.eechelons.EEchelons;
 import mod.gottsch.neoforge.eechelons.config.EchelonsHolder.Echelon;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.config.IConfigSpec;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
@@ -78,11 +79,18 @@ public final class Config extends AbstractConfig {
 	@SubscribeEvent
 	static void onLoad(final ModConfigEvent event)
 	{
-		// copy values from private builder spec definitions to public variables
-		if (event.getConfig().getType() == ModConfig.Type.CLIENT) {
-			CLIENT.load(event);
-		} else if (event.getConfig().getType() == ModConfig.Type.SERVER) {
-			SERVER.load(event);
+		if (!(event instanceof ModConfigEvent.Unloading)) {
+			IConfigSpec spec = event.getConfig().getSpec();
+			// copy values from private builder spec definitions to public variables
+			if (event.getConfig().getType() == ModConfig.Type.CLIENT) {
+				if (spec == CLIENT_SPEC) {
+					CLIENT.load(event);
+				}
+			} else if (event.getConfig().getType() == ModConfig.Type.SERVER) {
+				if (spec == SERVER_SPEC) {
+					SERVER.load(event);
+				}
+			}
 		}
 	}
 
@@ -111,14 +119,7 @@ public final class Config extends AbstractConfig {
 //				.comment(" Moves the Enemy Echelons HUD beside (to the left) of the WAILA HUD.",
 //						" This setting is ignored if hudXOffset or hudYOffset are set (not 0).")
 //				.define("enableWailaIntegration", true);
-//
-//		// TODO this IS moot for 1.21+
-//		private static final ModConfigSpec.BooleanValue ENABLE_CHAMPIONS_INTEGRATION = BUILDER
-//				.comment(" Moves the Enemy Echelons HUD beside (to the left) of the Champions HUD.",
-//						" This setting will supercede enableWailaIntegration.",
-//						" This setting is ignored if hudXOffset or hudYOffset are set (not 0).")
-//				.define("enableChampionsIntegration", true);
-//
+
 		public boolean enableWailaIntegration;
 //		public final boolean enableChampionsIntegration;
 
