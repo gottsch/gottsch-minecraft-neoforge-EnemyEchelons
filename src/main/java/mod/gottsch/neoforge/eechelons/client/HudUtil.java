@@ -1,6 +1,6 @@
 /*
  * This file is part of  Enemy Echelons.
- * Copyright (c) 2022, Mark Gottschling (gottsch)
+ * Copyright (c) 2022 Mark Gottschling (gottsch)
  *
  * Enemy Echelons is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -55,7 +55,7 @@ public class HudUtil {
 
 		int level = livingEntity.getData(ModDataAttachements.LEVEL);
 
-		if (level > -1) {
+		if (level > -1 && !Minecraft.getInstance().options.hideGui) {
 			Minecraft client = Minecraft.getInstance();
 			int i = client.getWindow().getGuiScaledWidth();
 			// middle of the screen

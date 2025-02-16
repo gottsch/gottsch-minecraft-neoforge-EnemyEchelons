@@ -1,6 +1,6 @@
 /*
  * This file is part of  Enemy Echelons.
- * Copyright (c) 2022, Mark Gottschling (gottsch)
+ * Copyright (c) 2022 Mark Gottschling (gottsch)
  * 
  * All rights reserved.
  *
@@ -50,10 +50,10 @@ public record LevelRequestToServer(int id, String registryName, String location)
 
 		// get level value from dataComponent
 		int level = entity.getData(ModDataAttachements.LEVEL);
-
+//		EEchelons.LOGGER.debug("level of mob on server -> {}", level);
 		// send message back to client entity
 		LevelMessageToClient payload = new LevelMessageToClient(entity.getId(), level);
-		PacketDistributor.sendToPlayer((ServerPlayer) context.player(), payload);
+		PacketDistributor.sendToPlayersTrackingEntity(entity, payload);
 	}
 
 	@Override

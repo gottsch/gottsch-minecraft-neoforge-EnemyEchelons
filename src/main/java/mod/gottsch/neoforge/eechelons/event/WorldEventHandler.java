@@ -46,18 +46,18 @@ public class WorldEventHandler {
 		Entity entity = event.getEntity();
 
 		if (EchelonManager.isValidEntity(entity)) {
-			EEchelons.LOGGER.debug("entity joining world -> {} : {}", entity.getName().getString(), entity.getId());
+//			EEchelons.LOGGER.debug("entity joining world -> {} : {}", entity.getName().getString(), entity.getId());
 			/*
 			 * if on the client, request an update from the server
 			 */
-			if (WorldInfo.isClientSide(event.getEntity().level())) {
+			if (event.getLevel().isClientSide) {
 				if (!entity.hasData(ModDataAttachements.LEVEL) ||
 						entity.getData(ModDataAttachements.LEVEL) == -1) {
 
 					// send message to server
 					LevelRequestToServer payload = new LevelRequestToServer(event.getEntity().getId(),
-							event.getEntity().level().dimension().location().toString(),
-							event.getEntity().level().dimension().location().toString());
+							event.getLevel().dimension().location().toString(),
+							event.getLevel().dimension().location().toString());
 					PacketDistributor.sendToServer(payload);
 				}
 			}

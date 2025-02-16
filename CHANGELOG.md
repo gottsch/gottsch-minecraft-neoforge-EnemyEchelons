@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - added condition to check for the Custom HUD range config. If =false, then use vanilla.
+- don't show HUD when MC HUD option = false
 
 
 ## [1.3.0] - 2024-09-07

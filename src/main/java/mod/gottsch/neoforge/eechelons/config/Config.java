@@ -24,6 +24,7 @@ import mod.gottsch.neoforge.eechelons.EEchelons;
 import mod.gottsch.neoforge.eechelons.config.EchelonsHolder.Echelon;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
@@ -77,11 +78,13 @@ public final class Config extends AbstractConfig {
 	@SubscribeEvent
 	static void onLoad(final ModConfigEvent event)
 	{
-		// TODO copy values from private builder spec definitions to public variables
-		CLIENT.load(event);
-		SERVER.load(event);
+		// copy values from private builder spec definitions to public variables
+		if (event.getConfig().getType() == ModConfig.Type.CLIENT) {
+			CLIENT.load(event);
+		} else if (event.getConfig().getType() == ModConfig.Type.SERVER) {
+			SERVER.load(event);
+		}
 	}
-
 
 	public static class CommonConfig {
 		public final Logging logging;

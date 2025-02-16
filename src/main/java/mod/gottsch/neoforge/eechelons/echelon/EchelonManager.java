@@ -22,13 +22,13 @@ package mod.gottsch.neoforge.eechelons.echelon;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import mod.gottsch.neo.gottschcore.random.WeightedCollection;
+import mod.gottsch.neoforge.eechelons.EEchelons;
 import mod.gottsch.neoforge.eechelons.bst.Interval;
 import mod.gottsch.neoforge.eechelons.bst.IntervalTree;
-//import mod.gottsch.neoforge.eechelons.capability.EEchelonsCapabilities;
-import mod.gottsch.neo.gottschcore.random.WeightedCollection;
 import mod.gottsch.neoforge.eechelons.config.Config;
-import mod.gottsch.neoforge.eechelons.config.EchelonsHolder.Echelon;
 import mod.gottsch.neoforge.eechelons.config.EchelonsHolder;
+import mod.gottsch.neoforge.eechelons.config.EchelonsHolder.Echelon;
 import mod.gottsch.neoforge.eechelons.data.ModDataAttachements;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
@@ -36,6 +36,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.monster.Zombie;
 import net.neoforged.fml.util.ObfuscationReflectionHelper;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -53,9 +54,8 @@ import java.util.function.Predicate;
  *
  */
 public class EchelonManager {
-	// TODO is the SRG reflection property still needed? YES, go use Neoforge discord to get fieldname
 	// f_21364_ => xpReward
-	private static final String XP_REWARD_FIELDNAME = "f_21364_";
+	private static final String XP_REWARD_FIELDNAME = "xpReward"; //"f_21364_";
 	private static final ResourceLocation ALL_DIMENSION = ResourceLocation.fromNamespaceAndPath(".", ".");
 
 	/*
@@ -146,34 +146,6 @@ public class EchelonManager {
 				echelon.getDimensions().add(".");
 			}
 
-//			if (ObjectUtils.isEmpty(echelon.getDimensions())) {
-//				if (!echelon.getModWhitelist().isEmpty()) {
-//					echelon.getModWhitelist().forEach(mod -> {
-//						// create a key pair
-//						Pair<ResourceLocation, String> keyPair = new ImmutablePair<>(ALL_DIMENSION, mod);
-//						if (!ECHELONS_BY_MOD.containsKey(keyPair)) {
-//							ECHELONS_BY_MOD.put(keyPair, echelon);
-////							HISTOGRAM_TREES_BY_MOD.put(keyPair, tree);
-//						}
-//					});
-//				}
-//				else if (!echelon.getMobWhitelist().isEmpty()) {
-//					echelon.getMobWhitelist().forEach(mob -> {
-//						// create a key pair
-//						Pair<ResourceLocation, ResourceLocation> keyPair = new ImmutablePair<>(ALL_DIMENSION, new ResourceLocation(mob));
-//						if (!ECHELONS_BY_MOB.containsKey(keyPair)) {
-//							ECHELONS_BY_MOB.put(keyPair, echelon);
-////							HISTOGRAM_TREES_BY_MOB.put(keyPair, tree);
-//						}
-//					});
-//
-//				}
-//				else {
-//					ECHELONS.put(ALL_DIMENSION, echelon);
-////					HISTOGRAM_TREES.put(ALL_DIMENSION, tree);
-//				}
-//			}
-//			else {
 			// build
 			echelon.getDimensions().forEach(dimension -> {
 				ResourceLocation dimensionKey;
@@ -189,7 +161,6 @@ public class EchelonManager {
 						Pair<ResourceLocation, String> keyPair = new ImmutablePair<>(dimensionKey, mod);
 						if (!ECHELONS_BY_MOD.containsKey(keyPair)) {
 							ECHELONS_BY_MOD.put(keyPair, echelon);
-//								HISTOGRAM_TREES_BY_MOD.put(keyPair, tree);
 						}
 					});
 				}
@@ -199,16 +170,13 @@ public class EchelonManager {
 						Pair<ResourceLocation, ResourceLocation> keyPair = new ImmutablePair<>(dimensionKey, ResourceLocation.parse(mob));
 						if (!ECHELONS_BY_MOB.containsKey(keyPair)) {
 							ECHELONS_BY_MOB.put(keyPair, echelon);
-//								HISTOGRAM_TREES_BY_MOB.put(keyPair, tree);
 						}
 					});
 				}
 				else {
 					ECHELONS.put(dimensionKey, echelon);
-//						HISTOGRAM_TREES.put(dimensionKey, tree);
 				}
 			});
-//			}
 		});
 	}
 
@@ -267,14 +235,17 @@ public class EchelonManager {
 	 * @param mob
 	 */
 	public static void applyModications(Mob mob) {
+		Integer echelonLevel = -1;
 
 		if (!mob.hasData(ModDataAttachements.LEVEL)) {
 			// init data attachments
-			mob.setData(ModDataAttachements.LEVEL, -1);
+			mob.setData(ModDataAttachements.LEVEL, echelonLevel);
+		} else {
+			echelonLevel = mob.getData(ModDataAttachements.LEVEL);
 		}
 
-		if (mob.getData(ModDataAttachements.LEVEL) < 0) {
-			// determine the altitute (y-value)
+		if (echelonLevel < 0) {
+			// determine the world height (y-value)
 			int y = mob.getBlockY();
 
 			/*
@@ -287,8 +258,8 @@ public class EchelonManager {
 				return;
 			}
 
-			Integer echelonLevel = echelon.get().getLevel(y);
-//				EEchelons.LOGGER.debug("selected level -> {} for dimension -> {} @ y -> {}", echelonLevel, dimension, y);
+			echelonLevel = echelon.get().getLevel(y);
+//			EEchelons.LOGGER.debug("selected level -> {} @ y -> {}", echelonLevel, y);
 
 			// health
 			modifyHealth(mob, echelonLevel, echelon.get());
@@ -314,7 +285,7 @@ public class EchelonManager {
 			// experience
 			modifyXp(mob, echelonLevel, echelon.get());
 
-			// update the capability
+			// update the data
 			mob.setData(ModDataAttachements.LEVEL, echelonLevel);
 		}
 	}
@@ -363,7 +334,7 @@ public class EchelonManager {
 				}
 				attribute.setBaseValue(newHealth);
 				mob.setHealth(mob.getMaxHealth());
-//				EEchelons.LOGGER.debug("mob new health -> {}", mob.getMaxHealth());
+				EEchelons.LOGGER.debug("mob new health -> {}", mob.getMaxHealth());
 			}
 		}
 	}
@@ -378,7 +349,7 @@ public class EchelonManager {
 					newDamage = Math.min(newDamage, echelon.getMaxDamage());
 				}
 				attribute.setBaseValue(newDamage);
-//				EEchelons.LOGGER.debug("mob new damage -> {}", mob.getAttributeValue(Attributes.ATTACK_DAMAGE));
+				EEchelons.LOGGER.debug("mob new damage -> {}", mob.getAttributeValue(Attributes.ATTACK_DAMAGE));
 			}
 		}
 	}

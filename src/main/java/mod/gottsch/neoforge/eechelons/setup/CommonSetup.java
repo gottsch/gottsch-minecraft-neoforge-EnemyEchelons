@@ -1,6 +1,6 @@
 /*
  * This file is part of  Enemy Echelons.
- * Copyright (c) 2022, Mark Gottschling (gottsch)
+ * Copyright (c) 2022 Mark Gottschling (gottsch)
  * 
  * All rights reserved.
  *
@@ -32,12 +32,10 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
  * @author Mark Gottschling on Jul 24, 2022
  *
  */
-@EventBusSubscriber(modid = EEchelons.MODID, bus = EventBusSubscriber.Bus.MOD)
 public class CommonSetup {
 
 	public static void init(final FMLCommonSetupEvent event) {
 		Config.instance.addRollingFileAppender(EEchelons.MODID);
-//		ChampionsIntegration.init();
 		WailaIntegration.init();
 	}	
 

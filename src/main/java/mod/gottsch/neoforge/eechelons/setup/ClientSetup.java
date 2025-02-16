@@ -1,6 +1,6 @@
 /*
  * This file is part of  Enemy Echelons.
- * Copyright (c) 2022, Mark Gottschling (gottsch)
+ * Copyright (c) 2022 Mark Gottschling (gottsch)
  *
  * Enemy Echelons is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -19,6 +19,7 @@ package mod.gottsch.neoforge.eechelons.setup;
 
 import mod.gottsch.neoforge.eechelons.EEchelons;
 import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 
@@ -27,9 +28,8 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
  * @author Mark Gottschling on Jul 24, 2022
  *
  */
-@EventBusSubscriber(modid = EEchelons.MODID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
 public class ClientSetup {
-	
+
     public static void init(final FMLClientSetupEvent event) {
     	
     }

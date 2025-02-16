@@ -1,6 +1,6 @@
 /*
  * This file is part of  Enemy Echelons.
- * Copyright (c) 2022, Mark Gottschling (gottsch)
+ * Copyright (c) 2022 Mark Gottschling (gottsch)
  * 
  * All rights reserved.
  *
@@ -22,15 +22,17 @@ package mod.gottsch.neoforge.eechelons.network;
 import mod.gottsch.neoforge.eechelons.EEchelons;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.DirectionalPayloadHandler;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 /**
- * TODO if usng DataComponents, won't have to use custom packets at all.
+ *
  * @author Mark Gottschling on Jul 28, 2022
  *
  */
+@EventBusSubscriber(modid = EEchelons.MODID, bus = EventBusSubscriber.Bus.MOD)
 public class EEchelonsNetwork {
 	public static final String PROTOCOL_VERSION = "1.0";
 
