@@ -26,11 +26,10 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RenderGuiOverlayEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
 
 import java.util.Optional;
 
@@ -51,17 +50,17 @@ public class HudEventHandler {
 	/**
 	 * Forge Bus Event Subscriber class
 	 */
-	@Mod.EventBusSubscriber(modid = EEchelons.MODID, bus = EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
+	@EventBusSubscriber(modid = EEchelons.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
 	public static class ForgeBusSubscriber {
 
 		@SubscribeEvent
-		public static void renderHealthHud(final RenderGuiOverlayEvent.Pre evt) {
-			if (Config.SERVER.showHud.get()) {
+		public static void renderHealthHud(final RenderGuiLayerEvent.Pre evt) {
+			if (Config.SERVER.showHud) {
 				Minecraft mc = Minecraft.getInstance();
 
 				Optional<LivingEntity> livingEntity;
-				if (Config.SERVER.hudRangeEnabled.get()) {
-					livingEntity = MouseUtil.getMouseOverEchelonMob(mc, evt.getPartialTick());
+				if (Config.SERVER.hudRangeEnabled) {
+					livingEntity = MouseUtil.getMouseOverEchelonMob(mc, evt.getPartialTick().getRealtimeDeltaTicks());
 				} else {
 					HitResult hitResult = mc.hitResult;
 					if (hitResult.getType() == HitResult.Type.ENTITY

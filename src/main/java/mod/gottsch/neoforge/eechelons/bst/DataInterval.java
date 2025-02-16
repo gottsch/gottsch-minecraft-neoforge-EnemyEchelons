@@ -19,12 +19,13 @@
  */
 package mod.gottsch.neoforge.eechelons.bst;
 
-import java.util.function.Supplier;
-
 import mod.gottsch.neoforge.eechelons.EEchelons;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraftforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.common.util.INBTSerializable;
+
+import java.util.function.Supplier;
 
 /**
  * TODO move to GottschCore
@@ -85,8 +86,6 @@ public class DataInterval<D extends INBTSerializable<Tag>> implements Comparable
 
 	/**
 	 * 
-	 * @param coords1
-	 * @param coords2
 	 * @param data
 	 */
 	public DataInterval(Integer start, Integer end, D data, Supplier<D> supplier) {
@@ -115,7 +114,7 @@ public class DataInterval<D extends INBTSerializable<Tag>> implements Comparable
 	 * 
 	 * @param nbt
 	 */
-	public void save(CompoundTag nbt) {
+	public void save(CompoundTag nbt, HolderLookup.Provider provider) {
 		EEchelons.LOGGER.debug("saving interval -> {}", this);
 		
 		nbt.putInt("start", start);
@@ -126,19 +125,19 @@ public class DataInterval<D extends INBTSerializable<Tag>> implements Comparable
 		
 //		CompoundTag dataNbt = new CompoundTag();
 		if (getData() != null) {
-			CompoundTag dataNbt = (CompoundTag) getData().serializeNBT();
+			CompoundTag dataNbt = (CompoundTag) getData().serializeNBT(provider);
 			nbt.put(DATA_KEY, dataNbt);
 		}
 		
 		if (getLeft() != null) {
 			CompoundTag left = new CompoundTag();
-			getLeft().save(left);
+			getLeft().save(left, provider);
 			nbt.put(LEFT_KEY, left);
 		}
 
 		if (getRight() != null) {
 			CompoundTag right = new CompoundTag();
-			getRight().save(right);
+			getRight().save(right, provider);
 			nbt.put(RIGHT_KEY, right);
 		}
 	}
@@ -148,7 +147,7 @@ public class DataInterval<D extends INBTSerializable<Tag>> implements Comparable
 	 * @param nbt
 	 * @return
 	 */
-	public void load(CompoundTag nbt) {
+	public void load(CompoundTag nbt, HolderLookup.Provider provider) {
 		int start = EMPTY.getStart();
 		int end = EMPTY.getEnd();
 		
@@ -175,13 +174,13 @@ public class DataInterval<D extends INBTSerializable<Tag>> implements Comparable
 		if (nbt.contains(DATA_KEY) && dataSupplier != null) {
 			CompoundTag dataNbt = (CompoundTag) nbt.get(DATA_KEY);
 			D data = dataSupplier.get();
-			data.deserializeNBT(dataNbt);
+			data.deserializeNBT(provider, dataNbt);
 			setData(data);
 		}
 		
 		if (nbt.contains(LEFT_KEY)) {
 			DataInterval<D> left = new DataInterval<>(dataSupplier);
-			left.load((CompoundTag) nbt.get(LEFT_KEY));
+			left.load((CompoundTag) nbt.get(LEFT_KEY), provider);
 			if (!left.equals(DataInterval.EMPTY)) {
 				setLeft(left);
 			}
@@ -189,7 +188,7 @@ public class DataInterval<D extends INBTSerializable<Tag>> implements Comparable
 		
 		if (nbt.contains(RIGHT_KEY)) {
 			DataInterval<D> right = new DataInterval<>(dataSupplier);
-			right.load((CompoundTag) nbt.get(RIGHT_KEY));
+			right.load((CompoundTag) nbt.get(RIGHT_KEY), provider);
 			if (!right.equals(DataInterval.EMPTY)) {
 				setRight(right);
 			}			

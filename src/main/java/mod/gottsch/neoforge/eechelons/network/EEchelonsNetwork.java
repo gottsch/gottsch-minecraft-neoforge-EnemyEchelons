@@ -19,34 +19,44 @@
  */
 package mod.gottsch.neoforge.eechelons.network;
 
-import java.util.Optional;
-
 import mod.gottsch.neoforge.eechelons.EEchelons;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.simple.SimpleChannel;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.handling.DirectionalPayloadHandler;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 /**
- * 
+ * TODO if usng DataComponents, won't have to use custom packets at all.
  * @author Mark Gottschling on Jul 28, 2022
  *
  */
 public class EEchelonsNetwork {
 	public static final String PROTOCOL_VERSION = "1.0";
-	public static SimpleChannel CHANNEL;
-	public static int TO_CLIENT_ID = 0;
-	public static int TO_SERVER_ID = 1;
-	
-	public static void register() {
-	    CHANNEL = NetworkRegistry.ChannelBuilder.named(new ResourceLocation(EEchelons.MODID, "eechelons_channel"))
-	        .networkProtocolVersion(() -> PROTOCOL_VERSION).clientAcceptedVersions(PROTOCOL_VERSION::equals)
-	        .serverAcceptedVersions(PROTOCOL_VERSION::equals).simpleChannel();
 
-	    CHANNEL.registerMessage(TO_CLIENT_ID, LevelMessageToClient.class, LevelMessageToClient::encode, LevelMessageToClient::decode,
-	        LevelMessageToClient::handle, Optional.of(NetworkDirection.PLAY_TO_CLIENT));
-	    
-	    CHANNEL.registerMessage(TO_SERVER_ID, LevelRequestToServer.class, LevelRequestToServer::encode, LevelRequestToServer::decode,
-	    		LevelRequestToServer::handle, Optional.of(NetworkDirection.PLAY_TO_SERVER));
+	public static final ResourceLocation LEVEL_REQUEST_SERVER_ID = ResourceLocation.fromNamespaceAndPath(EEchelons.MODID, "level_request_server");
+	public static final ResourceLocation LEVEL_MESSAGE_CLIENT_ID = ResourceLocation.fromNamespaceAndPath(EEchelons.MODID, "level_message_client");
+
+	@SubscribeEvent
+	public static void register(final RegisterPayloadHandlersEvent event) {
+
+		final PayloadRegistrar registrar = event.registrar(PROTOCOL_VERSION);
+		registrar.playToServer(
+				LevelRequestToServer.TYPE,
+				LevelRequestToServer.CODEC,
+				new DirectionalPayloadHandler<>(
+						LevelRequestToServer::handleDataOnMain,
+						LevelRequestToServer::handleDataOnMain
+				)
+		);
+
+		registrar.playToClient(
+				LevelMessageToClient.TYPE,
+				LevelMessageToClient.CODEC,
+				new DirectionalPayloadHandler<>(
+						LevelMessageToClient::handleDataOnMain,
+						LevelMessageToClient::handleDataOnMain
+				)
+		);
 	  }
 }

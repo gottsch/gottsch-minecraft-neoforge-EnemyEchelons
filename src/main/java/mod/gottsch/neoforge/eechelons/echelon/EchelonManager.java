@@ -1,7 +1,7 @@
 /*
  * This file is part of  Enemy Echelons.
  * Copyright (c) 2022 Mark Gottschling (gottsch)
- * 
+ *
  * All rights reserved.
  *
  * Enemy Echelons is free software: you can redistribute it and/or modify
@@ -19,50 +19,50 @@
  */
 package mod.gottsch.neoforge.eechelons.echelon;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Predicate;
-
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-
 import com.google.common.collect.Maps;
-
+import com.google.common.collect.Multimap;
 import mod.gottsch.neoforge.eechelons.bst.Interval;
 import mod.gottsch.neoforge.eechelons.bst.IntervalTree;
-import mod.gottsch.neoforge.eechelons.capability.EEchelonsCapabilities;
+//import mod.gottsch.neoforge.eechelons.capability.EEchelonsCapabilities;
+import mod.gottsch.neo.gottschcore.random.WeightedCollection;
 import mod.gottsch.neoforge.eechelons.config.Config;
 import mod.gottsch.neoforge.eechelons.config.EchelonsHolder.Echelon;
-import mod.gottsch.forge.gottschcore.random.WeightedCollection;
+import mod.gottsch.neoforge.eechelons.config.EchelonsHolder;
+import mod.gottsch.neoforge.eechelons.data.ModDataAttachements;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
-import net.minecraftforge.fml.util.ObfuscationReflectionHelper.UnableToAccessFieldException;
+import net.neoforged.fml.util.ObfuscationReflectionHelper;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 /**
- * 
+ *
  * @author Mark Gottschling on Jul 26, 2022
  *
  */
 public class EchelonManager {
+	// TODO is the SRG reflection property still needed? YES, go use Neoforge discord to get fieldname
 	// f_21364_ => xpReward
 	private static final String XP_REWARD_FIELDNAME = "f_21364_";
-	private static final ResourceLocation ALL_DIMENSION = new ResourceLocation(".", ".");
+	private static final ResourceLocation ALL_DIMENSION = ResourceLocation.fromNamespaceAndPath(".", ".");
 
 	/*
 	 * map of echelons by id
 	 * currently not implemented in any meaningful way.
 	 */
-	private static final Map<String, Echelon> ECHELONS_BY_ID = Maps.newHashMap();
+	private static final Map<String, EchelonsHolder.Echelon> ECHELONS_BY_ID = Maps.newHashMap();
 
 	/*
 	 * map of echelons by dimension
@@ -81,7 +81,7 @@ public class EchelonManager {
 	private static final Map<Pair<ResourceLocation, ResourceLocation>, Echelon> ECHELONS_BY_MOB = Maps.newHashMap();
 
 	/**
-	 * 
+	 *
 	 */
 	public static void build() {
 		ECHELONS_BY_ID.clear();
@@ -174,40 +174,40 @@ public class EchelonManager {
 //				}
 //			}
 //			else {
-				// build
-				echelon.getDimensions().forEach(dimension -> {
-					ResourceLocation dimensionKey;
-					if (dimension.equals(".") || dimension.equals("*") || dimension.equals("*:*")) {
-						dimensionKey = ALL_DIMENSION;
-					} else {
-						dimensionKey = new ResourceLocation(dimension);
-					}
+			// build
+			echelon.getDimensions().forEach(dimension -> {
+				ResourceLocation dimensionKey;
+				if (dimension.equals(".") || dimension.equals("*") || dimension.equals("*:*")) {
+					dimensionKey = ALL_DIMENSION;
+				} else {
+					dimensionKey = ResourceLocation.parse(dimension);
+				}
 
-					if (!echelon.getModWhitelist().isEmpty()) {
-						echelon.getModWhitelist().forEach(mod -> {
-							// create a key pair
-							Pair<ResourceLocation, String> keyPair = new ImmutablePair<>(dimensionKey, mod);
-							if (!ECHELONS_BY_MOD.containsKey(keyPair)) {
-								ECHELONS_BY_MOD.put(keyPair, echelon);
+				if (!echelon.getModWhitelist().isEmpty()) {
+					echelon.getModWhitelist().forEach(mod -> {
+						// create a key pair
+						Pair<ResourceLocation, String> keyPair = new ImmutablePair<>(dimensionKey, mod);
+						if (!ECHELONS_BY_MOD.containsKey(keyPair)) {
+							ECHELONS_BY_MOD.put(keyPair, echelon);
 //								HISTOGRAM_TREES_BY_MOD.put(keyPair, tree);
-							}
-						});
-					}
-					else if (!echelon.getMobWhitelist().isEmpty()) {
-						echelon.getMobWhitelist().forEach(mob -> {
-							// create a key pair
-							Pair<ResourceLocation, ResourceLocation> keyPair = new ImmutablePair<>(dimensionKey, new ResourceLocation(mob));
-							if (!ECHELONS_BY_MOB.containsKey(keyPair)) {
-								ECHELONS_BY_MOB.put(keyPair, echelon);
+						}
+					});
+				}
+				else if (!echelon.getMobWhitelist().isEmpty()) {
+					echelon.getMobWhitelist().forEach(mob -> {
+						// create a key pair
+						Pair<ResourceLocation, ResourceLocation> keyPair = new ImmutablePair<>(dimensionKey, ResourceLocation.parse(mob));
+						if (!ECHELONS_BY_MOB.containsKey(keyPair)) {
+							ECHELONS_BY_MOB.put(keyPair, echelon);
 //								HISTOGRAM_TREES_BY_MOB.put(keyPair, tree);
-							}
-						});
-					}
-					else {
-						ECHELONS.put(dimensionKey, echelon);
+						}
+					});
+				}
+				else {
+					ECHELONS.put(dimensionKey, echelon);
 //						HISTOGRAM_TREES.put(dimensionKey, tree);
-					}
-				});
+				}
+			});
 //			}
 		});
 	}
@@ -254,7 +254,7 @@ public class EchelonManager {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param entity
 	 * @return
 	 */
@@ -263,60 +263,64 @@ public class EchelonManager {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param mob
 	 */
 	public static void applyModications(Mob mob) {
-		mob.getCapability(EEchelonsCapabilities.LEVEL_CAPABILITY).ifPresent(cap -> {
 
-			if (cap.getLevel() < 0) {
-				// determine the altitute (y-value)
-				int y = mob.getBlockY();
+		if (!mob.hasData(ModDataAttachements.LEVEL)) {
+			// init data attachments
+			mob.setData(ModDataAttachements.LEVEL, -1);
+		}
 
-				/*
-				 *  apply the attribute modifications
-				 */
-				Optional<Echelon> echelon = getEchelon(mob);
+		if (mob.getData(ModDataAttachements.LEVEL) < 0) {
+			// determine the altitute (y-value)
+			int y = mob.getBlockY();
 
-				if (echelon.isEmpty()) {
-					cap.setLevel(0);
-					return;
-				}
+			/*
+			 *  apply the attribute modifications
+			 */
+			Optional<Echelon> echelon = getEchelon(mob);
 
-				Integer echelonLevel = echelon.get().getLevel(y);
+			if (echelon.isEmpty()) {
+				mob.setData(ModDataAttachements.LEVEL, 0);
+				return;
+			}
+
+			Integer echelonLevel = echelon.get().getLevel(y);
 //				EEchelons.LOGGER.debug("selected level -> {} for dimension -> {} @ y -> {}", echelonLevel, dimension, y);
 
-				// health
-				modifyHealth(mob, echelonLevel, echelon.get());
+			// health
+			modifyHealth(mob, echelonLevel, echelon.get());
 
-				// damage
-				modifyDamage(mob, echelonLevel, echelon.get());
+			// damage
+			modifyDamage(mob, echelonLevel, echelon.get());
 
-				// armor
-				modifyArmor(mob, echelonLevel, echelon.get());
+			// armor
+			modifyArmor(mob, echelonLevel, echelon.get());
 
-				// armor
-				modifyArmorToughness(mob, echelonLevel, echelon.get());
+			// armor
+			modifyArmorToughness(mob, echelonLevel, echelon.get());
 
-				// knockback
-				modifyKnockback(mob, echelonLevel, echelon.get());
+			// knockback
+			modifyKnockback(mob, echelonLevel, echelon.get());
 
-				// knockback resist
-				modifyKnockbackResist(mob, echelonLevel, echelon.get());
+			// knockback resist
+			modifyKnockbackResist(mob, echelonLevel, echelon.get());
 
-				// speed
-				modifySpeed(mob, echelonLevel, echelon.get());
+			// speed
+			modifySpeed(mob, echelonLevel, echelon.get());
 
-				// experience
-				modifyXp(mob, echelonLevel, echelon.get());
+			// experience
+			modifyXp(mob, echelonLevel, echelon.get());
 
-				// update the capability
-				cap.setLevel(echelonLevel);
-			}
-		});
+			// update the capability
+			mob.setData(ModDataAttachements.LEVEL, echelonLevel);
+		}
 	}
 
-	private static void modifySpeed(Mob mob, Integer level, Echelon echelon) {		
+
+	private static void modifySpeed(Mob mob, Integer level, Echelon echelon) {
 		if (echelon.hasSpeedFactor()) {
 			AttributeInstance attribute = mob.getAttribute(Attributes.MOVEMENT_SPEED);
 			if (attribute != null) {
@@ -328,7 +332,7 @@ public class EchelonManager {
 				}
 				attribute.setBaseValue(newSpeed);
 				//			EEchelons.LOGGER.debug("mob new speed -> {}", mob.getAttributeValue(Attributes.MOVEMENT_SPEED));
-			}	
+			}
 		}
 	}
 
@@ -336,13 +340,13 @@ public class EchelonManager {
 		if (echelon.hasXpFactor()) {
 			double xp = 1.0 + (echelon.getXpFactor() * level);
 			try {
-				int xpReward = (int)ObfuscationReflectionHelper.getPrivateValue(Mob.class, mob, XP_REWARD_FIELDNAME);
+				int xpReward = (int) ObfuscationReflectionHelper.getPrivateValue(Mob.class, mob, XP_REWARD_FIELDNAME);
 				double newXpReward = xpReward * xp;
 				if (echelon.getMaxXp() != null) {
 					newXpReward = Math.min(newXpReward, echelon.getMaxXp());
 				}
 				ObfuscationReflectionHelper.setPrivateValue(Mob.class, mob, (int)newXpReward, XP_REWARD_FIELDNAME);
-			} catch(UnableToAccessFieldException e	) {
+			} catch(ObfuscationReflectionHelper.UnableToAccessFieldException e	) {
 				return;
 			}
 		}
@@ -364,7 +368,7 @@ public class EchelonManager {
 		}
 	}
 
-	private static void modifyDamage(Mob mob, int level, Echelon echelon) {		
+	private static void modifyDamage(Mob mob, int level, Echelon echelon) {
 		if (echelon.hasDamageFactor()) {
 			AttributeInstance attribute = mob.getAttribute(Attributes.ATTACK_DAMAGE);
 			if (attribute != null) {

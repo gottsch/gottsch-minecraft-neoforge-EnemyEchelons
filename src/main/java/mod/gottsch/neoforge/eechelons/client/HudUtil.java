@@ -22,10 +22,9 @@ import java.awt.Color;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import mod.gottsch.neoforge.eechelons.EEchelons;
-import mod.gottsch.neoforge.eechelons.capability.EEchelonsCapabilities;
 import mod.gottsch.neoforge.eechelons.config.Config;
+import mod.gottsch.neoforge.eechelons.data.ModDataAttachements;
 import mod.gottsch.neoforge.eechelons.event.HudEventHandler;
-import mod.gottsch.neoforge.eechelons.integration.ChampionsIntegration;
 import mod.gottsch.neoforge.eechelons.integration.WailaIntegration;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -40,12 +39,11 @@ import net.minecraft.world.entity.LivingEntity;
  */
 public class HudUtil {
 	private static final int WAILA_INTEGRATION_XOFFSET = -80;
-	private static final int CHAMPIONS_INTEGRATION_XOFFSET = -124;
 	
 	private static final int HUD_OFFSET_WIDTH = 32;
 	private static final int HUD_OFFSET_HEIGHT = 4;
-	private static final ResourceLocation HUD_BG = new ResourceLocation(EEchelons.MODID, "textures/gui/echelon_hud_bg.png");
-	private static final ResourceLocation HUD_DARK_BG = new ResourceLocation(EEchelons.MODID, "textures/gui/echelon_hud_dark_bg.png");
+	private static final ResourceLocation HUD_BG = ResourceLocation.fromNamespaceAndPath(EEchelons.MODID, "textures/gui/echelon_hud_bg.png");
+	private static final ResourceLocation HUD_DARK_BG = ResourceLocation.fromNamespaceAndPath(EEchelons.MODID, "textures/gui/echelon_hud_dark_bg.png");
 	
 	/**
 	 * 
@@ -55,7 +53,7 @@ public class HudUtil {
 	 */
 	public static boolean renderLevelBar(GuiGraphics matrixStack, final LivingEntity livingEntity) {
 
-		int level = livingEntity.getCapability(EEchelonsCapabilities.LEVEL_CAPABILITY).map(cap -> cap.getLevel()).orElse(0);
+		int level = livingEntity.getData(ModDataAttachements.LEVEL);
 
 		if (level > -1) {
 			Minecraft client = Minecraft.getInstance();
@@ -64,14 +62,14 @@ public class HudUtil {
 			int k = i / 2 - HUD_OFFSET_WIDTH;
 			int j = HUD_OFFSET_HEIGHT;
 			
-			int xOffset = Config.CLIENT.hudXOffset.get();
-			int yOffset = Config.CLIENT.hudYOffset.get();
+			int xOffset = Config.CLIENT.hudXOffset;
+			int yOffset = Config.CLIENT.hudYOffset;
 
 			RenderSystem.defaultBlendFunc();
 			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 			RenderSystem.enableBlend();
 			RenderSystem.setShader(GameRenderer::getPositionTexShader);
-			RenderSystem.setShaderTexture(0, Config.CLIENT.useDarkHud.get() ? HUD_DARK_BG : HUD_BG); // GUI_BAR_TEXTURES);
+			RenderSystem.setShaderTexture(0, Config.CLIENT.useDarkHud ? HUD_DARK_BG : HUD_BG); // GUI_BAR_TEXTURES);
 
 			/*
 			 * only recalc offsets for integration if the config offsets are still default values
@@ -79,10 +77,7 @@ public class HudUtil {
 			int integrationXOffset = 0;
 			int integrationYOffset = 0;
 			if (xOffset == 0 && yOffset == 0) {
-				if (ChampionsIntegration.isEnabled()) {
-					integrationXOffset = CHAMPIONS_INTEGRATION_XOFFSET;
-				}
-				else if (WailaIntegration.isEnabled()) {
+				if (WailaIntegration.isEnabled()) {
 					integrationXOffset = WAILA_INTEGRATION_XOFFSET;
 				}
 			}

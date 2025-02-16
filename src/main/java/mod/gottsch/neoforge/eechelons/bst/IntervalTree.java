@@ -19,11 +19,11 @@
  */
 package mod.gottsch.neoforge.eechelons.bst;
 
+import mod.gottsch.neoforge.eechelons.EEchelons;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
-
-import mod.gottsch.neoforge.eechelons.EEchelons;
 
 /**
  * 
@@ -154,7 +154,7 @@ public class IntervalTree<D> {
 	 * @param interval
 	 * @param testInterval
 	 * @param results
-	 * @param findFirst find first occurrence only
+	 * @param findFast find first occurrence only
 	 * @return whether an overlap was found in this subtree
 	 */
 	private boolean checkOverlap(Interval<D> interval, Interval<D> testInterval, List<Interval<D>> results, boolean findFast) {
@@ -193,7 +193,7 @@ public class IntervalTree<D> {
 	 * @param interval
 	 * @param testInterval
 	 * @param results
-	 * @param findFirst find first occurrence only
+	 * @param findFast find first occurrence only
 	 * @return whether an overlap was found in this subtree
 	 */
 	private boolean checkOverlapNoBorder(Interval<D> interval, Interval<D> testInterval, List<Interval<D>> results, boolean findFast) {

@@ -19,78 +19,49 @@
  */
 package mod.gottsch.neoforge.eechelons.network;
 
-import java.util.function.Supplier;
-
-import mod.gottsch.neoforge.eechelons.EEchelons;
-import mod.gottsch.neoforge.eechelons.capability.EEchelonsCapabilities;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.entity.Entity;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.NetworkEvent.Context;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * 
  * @author Mark Gottschling on Jul 28, 2022
  *
  */
-public class LevelMessageToClient {
-	private final int entityId;
-	private final int level;
+public record LevelMessageToClient(int id, int level) implements CustomPacketPayload {
+	public static final CustomPacketPayload.Type<LevelMessageToClient> TYPE = new CustomPacketPayload.Type<>(EEchelonsNetwork.LEVEL_MESSAGE_CLIENT_ID);
+	public static final StreamCodec<RegistryFriendlyByteBuf, LevelMessageToClient> CODEC =
+			StreamCodec.composite(
+					ByteBufCodecs.INT, LevelMessageToClient::id,
+					ByteBufCodecs.INT, LevelMessageToClient::level,
+					LevelMessageToClient::new);
 
-	public LevelMessageToClient(int entityId, int level) {
-		this.entityId = entityId;
-		this.level = level;
+
+	public static void handleDataOnMain(final LevelMessageToClient data, final IPayloadContext context) {//        MageFlame.LOGGER.debug("server received packet: uuid ->{}, id -> {}", uuid, id);
+
+//		ClientLevel world = Minecraft.getInstance().level;
+//		if (world != null) {
+//			Entity entity = world.getEntity(msg.entityId);
+////			EEchelons.LOGGER.debug("handling client message to entity -> {} for level -> {}", entity.getName().getString(), msg.level);
+//			entity.getCapability(EEchelonsCapabilities.LEVEL_CAPABILITY).ifPresent(cap -> {
+////				EEchelons.LOGGER.debug("setting the level on the client entity");
+//				cap.setLevel(msg.level);
+//			});
+//		}
 	}
 
-	public static void encode(LevelMessageToClient msg, FriendlyByteBuf buf) {
-		buf.writeInt(msg.entityId);
-		buf.writeInt(msg.level);
-	}
-
-	public static LevelMessageToClient decode(FriendlyByteBuf buf) {
-		int entityId = buf.readInt();
-		int level = buf.readInt();
-		return new LevelMessageToClient(entityId, level);
-	}
-
-	public static void handle(LevelMessageToClient msg, Supplier<NetworkEvent.Context> context) {
-//		EEchelons.LOGGER.debug("received message on client -> {}", msg);
-		NetworkEvent.Context ctx = context.get();
-		LogicalSide sideReceived = ctx.getDirection().getReceptionSide();
-
-		if (sideReceived != LogicalSide.CLIENT) {
-			EEchelons.LOGGER.warn("LevelMessageToClient received on wrong side -> {}", ctx.getDirection().getReceptionSide());
-			return;
-		}
-
-		context.get().enqueueWork(() ->
-		DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> processMessage(ctx, msg))
-				);
-		context.get().setPacketHandled(true);
-
-	}
-
-	private static void processMessage(Context ctx, LevelMessageToClient msg) {
-		ClientLevel world = Minecraft.getInstance().level;
-		if (world != null) {
-			Entity entity = world.getEntity(msg.entityId);
-//			EEchelons.LOGGER.debug("handling client message to entity -> {} for level -> {}", entity.getName().getString(), msg.level);
-			entity.getCapability(EEchelonsCapabilities.LEVEL_CAPABILITY).ifPresent(cap -> {
-//				EEchelons.LOGGER.debug("setting the level on the client entity");
-				cap.setLevel(msg.level);
-			});
-		}
+	@Override
+	public Type<? extends CustomPacketPayload> type() {
+		return TYPE;
 	}
 
 	@Override
 	public String toString() {
-		return "LevelMessageToClient [entityId=" + entityId + ", level=" + level + "]";
+		return "LevelMessageToClient{" +
+				"id=" + id +
+				", level=" + level +
+				'}';
 	}
-
-
 }

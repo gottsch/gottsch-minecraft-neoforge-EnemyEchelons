@@ -17,10 +17,8 @@
  */
 package mod.gottsch.neoforge.eechelons.client;
 
-import java.util.Optional;
-
-import mod.gottsch.neoforge.eechelons.capability.EEchelonsCapabilities;
 import mod.gottsch.neoforge.eechelons.config.Config;
+import mod.gottsch.neoforge.eechelons.data.ModDataAttachements;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -29,6 +27,8 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.Optional;
 
 /**
  * This class was derived from Champions by TheIllusiveC4
@@ -40,7 +40,7 @@ public class MouseUtil {
 		Entity entity = mc.getCameraEntity();
 		if (entity != null) {
 			if (mc.level != null) {
-				double range = Config.SERVER.hudRange.get();
+				double range = Config.SERVER.hudRange;
 				HitResult rayTraceResult = entity.pick(range, partialTicks, false);
 				Vec3 vec3d = entity.getEyePosition(partialTicks);
 				double distance = rayTraceResult.getLocation().distanceToSqr(vec3d);
@@ -52,7 +52,7 @@ public class MouseUtil {
 
 				if (entityRayTraceResult != null) {
 					Entity hoverEntity = entityRayTraceResult.getEntity();
-					if (hoverEntity.getCapability(EEchelonsCapabilities.LEVEL_CAPABILITY).isPresent()) {
+					if (hoverEntity.hasData(ModDataAttachements.LEVEL)) {
 						return Optional.of((LivingEntity)hoverEntity);
 					}
 				}

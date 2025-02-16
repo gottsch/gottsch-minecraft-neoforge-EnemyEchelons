@@ -18,7 +18,7 @@
 package mod.gottsch.neoforge.eechelons.integration;
 
 import mod.gottsch.neoforge.eechelons.config.Config;
-import net.minecraftforge.fml.ModList;
+import net.neoforged.fml.ModList;
 
 /**
  * 
@@ -41,7 +41,7 @@ public class WailaIntegration {
 	}
 
 	public static boolean isEnabled() {
-		return Config.CLIENT.enableWailaIntegration.get()
+		return Config.CLIENT.enableWailaIntegration
 				&& (jadeLoaded || wthitLoaded);
 	}
 	

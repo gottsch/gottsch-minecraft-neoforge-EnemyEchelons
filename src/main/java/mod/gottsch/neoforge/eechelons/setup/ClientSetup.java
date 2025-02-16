@@ -18,16 +18,16 @@
 package mod.gottsch.neoforge.eechelons.setup;
 
 import mod.gottsch.neoforge.eechelons.EEchelons;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 
 /**
  * 
  * @author Mark Gottschling on Jul 24, 2022
  *
  */
-@Mod.EventBusSubscriber(modid = EEchelons.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = EEchelons.MODID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
 public class ClientSetup {
 	
     public static void init(final FMLClientSetupEvent event) {

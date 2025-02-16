@@ -17,6 +17,9 @@
  */
 package mod.gottsch.neoforge.eechelons.setup;
 
+import mod.gottsch.neoforge.eechelons.data.ModDataAttachements;
+import net.neoforged.bus.api.IEventBus;
+
 /**
  * 
  * @author Mark Gottschling on Jul 24, 2022
@@ -24,8 +27,8 @@ package mod.gottsch.neoforge.eechelons.setup;
  */
 public class Registration {
 
-	public static void init() {
-		
+	public static void init(IEventBus eventBus) {
+		ModDataAttachements.register(eventBus);
 	}
 
 }

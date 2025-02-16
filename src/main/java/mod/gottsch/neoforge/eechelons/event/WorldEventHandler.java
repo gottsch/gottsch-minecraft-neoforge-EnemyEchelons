@@ -17,60 +17,54 @@
  */
 package mod.gottsch.neoforge.eechelons.event;
 
+import mod.gottsch.neo.gottschcore.world.WorldInfo;
 import mod.gottsch.neoforge.eechelons.EEchelons;
-import mod.gottsch.neoforge.eechelons.capability.EEchelonsCapabilities;
+import mod.gottsch.neoforge.eechelons.data.ModDataAttachements;
 import mod.gottsch.neoforge.eechelons.echelon.EchelonManager;
-import mod.gottsch.neoforge.eechelons.network.EEchelonsNetwork;
 import mod.gottsch.neoforge.eechelons.network.LevelRequestToServer;
-import mod.gottsch.forge.gottschcore.world.WorldInfo;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
-import net.minecraftforge.event.entity.EntityJoinLevelEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
- * 
+ *
  * @author Mark Gottschling on Jul 31, 2022
  *
  */
+@EventBusSubscriber(modid = EEchelons.MODID, bus = EventBusSubscriber.Bus.GAME)
 public class WorldEventHandler {
 
 	/**
-	 * Forge Bus Event Subscriber class
+	 *
 	 */
-	@Mod.EventBusSubscriber(modid = EEchelons.MODID, bus = EventBusSubscriber.Bus.FORGE)
-	public static class ForgeBusSubscriber {
+	@SubscribeEvent
+	public static void onJoin(EntityJoinLevelEvent event) {
 
-		/**
-		 * 
-		 * @param event
-		 */
-		@SubscribeEvent
-		public static void onJoin(EntityJoinLevelEvent event) {
+		Entity entity = event.getEntity();
 
-			Entity entity = event.getEntity();
+		if (EchelonManager.isValidEntity(entity)) {
+			EEchelons.LOGGER.debug("entity joining world -> {} : {}", entity.getName().getString(), entity.getId());
+			/*
+			 * if on the client, request an update from the server
+			 */
+			if (WorldInfo.isClientSide(event.getEntity().level())) {
+				if (!entity.hasData(ModDataAttachements.LEVEL) ||
+						entity.getData(ModDataAttachements.LEVEL) == -1) {
 
-			if (EchelonManager.isValidEntity(entity)) {
-//				EEchelons.LOGGER.debug("entity joining world -> {} : {}", entity.getName().getString(), entity.getId());
-				/*
-				 * if on the client, request an update from the server
-				 */
-				if (WorldInfo.isClientSide(event.getEntity().level())) {
-					// get cap, ensure that level hasn't already been set.
-					if (entity.getCapability(EEchelonsCapabilities.LEVEL_CAPABILITY).map(cap -> cap.getLevel() == -1).orElse(false)) {
-						LevelRequestToServer message = new LevelRequestToServer(entity.getId(), entity.level().dimension().location().toString(),
-								entity.level().dimension().location().toString());
-						EEchelonsNetwork.CHANNEL.sendToServer(message);
-					}
+					// send message to server
+					LevelRequestToServer payload = new LevelRequestToServer(event.getEntity().getId(),
+							event.getEntity().level().dimension().location().toString(),
+							event.getEntity().level().dimension().location().toString());
+					PacketDistributor.sendToServer(payload);
 				}
-				else {
-					Mob mob = (Mob)entity;
-					EchelonManager.applyModications(mob);
-				}
+			}
+			else {
+				Mob mob = (Mob)entity;
+				EchelonManager.applyModications(mob);
 			}
 		}
 	}
-
 }

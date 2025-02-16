@@ -19,9 +19,9 @@
  */
 package mod.gottsch.neoforge.eechelons.config;
 
+import mod.gottsch.neo.gottschcore.random.WeightedCollection;
 import mod.gottsch.neoforge.eechelons.bst.Interval;
 import mod.gottsch.neoforge.eechelons.bst.IntervalTree;
-import mod.gottsch.forge.gottschcore.random.WeightedCollection;
 import org.apache.commons.lang3.ObjectUtils;
 
 import java.util.ArrayList;

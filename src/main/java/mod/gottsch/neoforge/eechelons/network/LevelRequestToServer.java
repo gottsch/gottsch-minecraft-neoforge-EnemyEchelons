@@ -19,89 +19,54 @@
  */
 package mod.gottsch.neoforge.eechelons.network;
 
-import java.util.function.Supplier;
-
-import mod.gottsch.neoforge.eechelons.EEchelons;
-import mod.gottsch.neoforge.eechelons.capability.EEchelonsCapabilities;
-import net.minecraft.network.FriendlyByteBuf;
+import mod.gottsch.neoforge.eechelons.data.ModDataAttachements;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.NetworkEvent.Context;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * 
  * @author Mark Gottschling on Jul 30, 2022
  *
  */
-public class LevelRequestToServer {
-	private final int entityId;
-	private final String registryName;
-	private final String location;
+public record LevelRequestToServer(int id, String registryName, String location) implements CustomPacketPayload {
+	public static final CustomPacketPayload.Type<LevelRequestToServer> TYPE = new CustomPacketPayload.Type<>(EEchelonsNetwork.LEVEL_REQUEST_SERVER_ID);
+	public static final StreamCodec<RegistryFriendlyByteBuf, LevelRequestToServer> CODEC =
+			StreamCodec.composite(
+					ByteBufCodecs.INT, LevelRequestToServer::id,
+					ByteBufCodecs.STRING_UTF8, LevelRequestToServer::registryName,
+					ByteBufCodecs.STRING_UTF8, LevelRequestToServer::location,
+					LevelRequestToServer::new);
 
-	public LevelRequestToServer(int entityId, String registryName, String location) {
-		this.entityId = entityId;
-		this.registryName = registryName;
-		this.location = location;
+	public static void handleDataOnMain(final LevelRequestToServer data, final IPayloadContext context) {//        MageFlame.LOGGER.debug("server received packet: uuid ->{}, id -> {}", uuid, id);
+
+		// get the entity by id
+		Entity entity = ((ServerPlayer)context.player()).serverLevel().getEntity(data.id());
+
+		// get level value from dataComponent
+		int level = entity.getData(ModDataAttachements.LEVEL);
+
+		// send message back to client entity
+		LevelMessageToClient payload = new LevelMessageToClient(entity.getId(), level);
+		PacketDistributor.sendToPlayer((ServerPlayer) context.player(), payload);
 	}
 
-	public static void encode(LevelRequestToServer msg, FriendlyByteBuf buf) {
-		buf.writeInt(msg.entityId);
-		buf.writeUtf(msg.registryName);
-		buf.writeUtf(msg.location);
+	@Override
+	public Type<? extends CustomPacketPayload> type() {
+		return TYPE;
 	}
 
-	public static LevelRequestToServer decode(FriendlyByteBuf buf) {
-		int entityId = buf.readInt();
-		String registryName = buf.readUtf();
-		String location = buf.readUtf();
-		return new LevelRequestToServer(entityId, registryName, location);
-	}
-
-	public static void handle(LevelRequestToServer msg, Supplier<NetworkEvent.Context> context) {
-//		EEchelons.LOGGER.debug("received request message -> {}", msg);
-		NetworkEvent.Context ctx = context.get();
-		LogicalSide sideReceived = ctx.getDirection().getReceptionSide();
-
-		if (sideReceived != LogicalSide.SERVER) {
-			EEchelons.LOGGER.warn("LevelRequestToServer received on wrong side -> {}", ctx.getDirection().getReceptionSide());
-			return;
-		}
-
-		ctx.enqueueWork(() -> {
-			processMessage(ctx, msg);
-		});
-
-		context.get().setPacketHandled(true);
-
-	}
-
-	private static void processMessage(Context ctx, LevelRequestToServer msg) {
-		Level world = ctx.getSender().level();
-
-//		EEchelons.LOGGER.debug("processing request message -> {}", msg);
-		if (world != null) {
-			Entity entity = world.getEntity(msg.entityId);
-			if (entity != null) {
-//				EEchelons.LOGGER.debug("handling server message to entity -> {} : {}", entity.getName().getString(), entity.getId());
-				entity.getCapability(EEchelonsCapabilities.LEVEL_CAPABILITY).ifPresent(cap -> {
-//					EEchelons.LOGGER.debug("entity {} has cap", entity.getId());
-					// send the level back to the client
-					LevelMessageToClient message = new LevelMessageToClient(entity.getId(), cap.getLevel());
-					EEchelonsNetwork.CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(() -> entity), message);
-				});
-			}
-		}
-	}
-	
 	@Override
 	public String toString() {
-		return "LevelRequestToServer [entityId=" + entityId + ", registryName=" + registryName + ", location="
-				+ location + "]";
+		return "LevelRequestToServer{" +
+				"id=" + id +
+				", registryName='" + registryName + '\'' +
+				", location='" + location + '\'' +
+				'}';
 	}
-
 }

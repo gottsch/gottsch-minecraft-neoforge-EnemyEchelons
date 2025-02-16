@@ -50,6 +50,9 @@ public final class Config extends AbstractConfig {
 	public static final ModConfigSpec COMMON_SPEC;
 	public static final CommonConfig COMMON;
 
+	// this variable is used solely for creating custom logger file.
+	public static Config instance = new Config();
+
 	static {
 		final Pair<CommonConfig, ModConfigSpec> commonSpecPair = new ModConfigSpec.Builder()
 				.configure(CommonConfig::new);
@@ -94,6 +97,7 @@ public final class Config extends AbstractConfig {
 		private final ModConfigSpec.IntValue HUD_XOFFSET;
 		private final ModConfigSpec.IntValue HUD_YOFFSET;
 		private final ModConfigSpec.BooleanValue USE_DARK_HUD;
+		private final ModConfigSpec.BooleanValue ENABLE_WAILA_INTEGRATION;
 
 		public int hudXOffset;
 		public int hudYOffset;
@@ -112,7 +116,7 @@ public final class Config extends AbstractConfig {
 //						" This setting is ignored if hudXOffset or hudYOffset are set (not 0).")
 //				.define("enableChampionsIntegration", true);
 //
-//		public final boolean enableWailaIntegration;
+		public boolean enableWailaIntegration;
 //		public final boolean enableChampionsIntegration;
 
 		public ClientConfig(ModConfigSpec.Builder builder) {
@@ -127,12 +131,19 @@ public final class Config extends AbstractConfig {
 			USE_DARK_HUD = builder
 					.comment(" Use dark theme HUD.")
 					.define("useDarkHud", true);
+
+			ENABLE_WAILA_INTEGRATION = builder
+					.comment(" Moves the Enemy Echelons HUD beside (to the left) of the WAILA HUD.",
+						" This setting is ignored if hudXOffset or hudYOffset are set (not 0).")
+					.define("enableWailaIntegration", true);
+
 		}
 
 		public void load(final ModConfigEvent event) {
 			this.hudXOffset = HUD_XOFFSET.get();
 			this.hudYOffset = HUD_YOFFSET.get();
 			this.useDarkHud = USE_DARK_HUD.get();
+			this.enableWailaIntegration = ENABLE_WAILA_INTEGRATION.get();
 		}
 	}
 

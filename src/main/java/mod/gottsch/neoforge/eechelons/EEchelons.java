@@ -55,13 +55,14 @@ public class EEchelons {
 
 	public static final String MODID = "eechelons";
 
-	private static final String ECHELONS_CONFIG_VERSION = "1.20.1-v3";
+	private static final String ECHELONS_CONFIG_VERSION = "1.21.1-v3";
+
 	/**
 	 * 
 	 */
 	public EEchelons(IEventBus eventBus, ModContainer modContainer) {
 		// register the deferred registries
-		Registration.init();
+		Registration.init(eventBus);
 		// register the server config
 		modContainer.registerConfig(ModConfig.Type.CLIENT, Config.CLIENT_SPEC);
 		modContainer.registerConfig(ModConfig.Type.COMMON, Config.COMMON_SPEC);

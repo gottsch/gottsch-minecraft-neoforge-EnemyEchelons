@@ -68,9 +68,6 @@ public class Interval<D> implements Comparable<Interval<D>> {
 
 	/**
 	 * 
-	 * @param coords1
-	 * @param coords2
-	 * @param data
 	 */
 	public Interval(Integer start, Integer end, D data) {
 		this(start, end);

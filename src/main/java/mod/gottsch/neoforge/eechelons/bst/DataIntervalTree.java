@@ -1,14 +1,15 @@
 package mod.gottsch.neoforge.eechelons.bst;
 
+import mod.gottsch.neoforge.eechelons.EEchelons;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.neoforged.neoforge.common.util.INBTSerializable;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-
-import mod.gottsch.neoforge.eechelons.EEchelons;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
-import net.minecraftforge.common.util.INBTSerializable;
 
 /**
  * TODO move to GottschCore
@@ -208,15 +209,12 @@ public class DataIntervalTree<D extends INBTSerializable<Tag>> {
 	
 	/**
 	 * 
-	 * @param nbt
-	 * @param interval
-	 * @return
 	 */
-	public synchronized CompoundTag save(CompoundTag nbt) {
+	public synchronized CompoundTag save(CompoundTag nbt, HolderLookup.Provider provider) {
 		if (getRoot() == null) {
 			return nbt;
 		}
-		getRoot().save(nbt);	        	        
+		getRoot().save(nbt, provider);
 		return nbt;
 	}
 	
@@ -224,9 +222,9 @@ public class DataIntervalTree<D extends INBTSerializable<Tag>> {
 	 * 
 	 * @param nbt
 	 */
-	public synchronized void load(CompoundTag nbt) {
+	public synchronized void load(CompoundTag nbt, HolderLookup.Provider provider) {
 		DataInterval<D> root = new DataInterval<>(dataSupplier);
-		root.load(nbt);
+		root.load(nbt, provider);
 		if (!root.equals(DataInterval.EMPTY)) {
 			setRoot(root);
 		}

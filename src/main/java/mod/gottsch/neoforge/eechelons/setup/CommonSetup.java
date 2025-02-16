@@ -21,24 +21,23 @@ package mod.gottsch.neoforge.eechelons.setup;
 
 import mod.gottsch.neoforge.eechelons.EEchelons;
 import mod.gottsch.neoforge.eechelons.config.Config;
-import mod.gottsch.neoforge.eechelons.integration.ChampionsIntegration;
+import mod.gottsch.neoforge.eechelons.data.ModDataAttachements;
 import mod.gottsch.neoforge.eechelons.integration.WailaIntegration;
 import mod.gottsch.neoforge.eechelons.network.EEchelonsNetwork;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 
 /**
  * 
  * @author Mark Gottschling on Jul 24, 2022
  *
  */
-@Mod.EventBusSubscriber(modid = EEchelons.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = EEchelons.MODID, bus = EventBusSubscriber.Bus.MOD)
 public class CommonSetup {
 
 	public static void init(final FMLCommonSetupEvent event) {
 		Config.instance.addRollingFileAppender(EEchelons.MODID);
-		EEchelonsNetwork.register();
-		ChampionsIntegration.init();
+//		ChampionsIntegration.init();
 		WailaIntegration.init();
 	}	
 
