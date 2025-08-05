@@ -15,7 +15,7 @@ license="LGPL v3"
 [[mods]] #mandatory
 
 # The modid of the mod
-modId="eechelons" #mandatory
+modId="eechelonsapi" #mandatory
 
 # The version number of the mod
 version="1.21.1-1.4.0" #mandatory
@@ -50,6 +50,10 @@ authors="gottsch" #optional
 description='''
 A mod that assigns levels and attribute modifications to mobs based on the world height range that they spawn at.
 '''
+
+# The side this mod is loaded on. Can be CLIENT, SERVER, or BOTH.
+side="SERVER" #mandatory for a server-side only mod
+
 # The [[mixins]] block allows you to declare your mixin config to FML so that it gets loaded.
 #[[mixins]]
 #config="${mod_id}.mixins.json"
@@ -62,7 +66,7 @@ A mod that assigns levels and attribute modifications to mobs based on the world
 # The coremods config file path is not configurable and is always loaded from META-INF/coremods.json
 
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
-[[dependencies.eechelons]] #optional
+[[dependencies.eechelonsapi]] #optional
 # the modid of the dependency
 modId="neoforge" #mandatory
 # The type of the dependency. Can be one of "required", "optional", "incompatible" or "discouraged" (case insensitive).
@@ -81,7 +85,7 @@ ordering="NONE"
 side="BOTH"
 
 # Here's another dependency
-[[dependencies.eechelons]]
+[[dependencies.eechelonsapi]]
 modId="minecraft"
 type="required"
 # This version range declares a minimum of the current minecraft version up to but not including the next major version
@@ -89,13 +93,13 @@ versionRange="[1.21.1]"
 ordering="NONE"
 side="BOTH"
 
-[[dependencies.eechelons]]
+[[dependencies.eechelonsapi]]
 modId="gottschcore"
 type="required"
 # This version range declares a minimum of the current minecraft version up to but not including the next major version
-versionRange="[1.21.1-2.3.0, 1.21.1-3.0.0]"
+versionRange="[1.21.1-2.5.0, 1.21.1-3.0.0]"
 ordering="BEFORE"
-side="BOTH"
+side="SERVER"
 
 # Features are specific properties of the game environment, that you may want to declare you require. This example declares
 # that your mod requires GL version 3.2 or higher. Other features will be added. They are side aware so declaring this won't

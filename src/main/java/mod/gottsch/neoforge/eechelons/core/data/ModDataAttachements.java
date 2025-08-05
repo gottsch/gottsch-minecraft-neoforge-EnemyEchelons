@@ -15,10 +15,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with Enemy Echelons.  If not, see <http://www.gnu.org/licenses/lgpl>.
  */
-package mod.gottsch.neoforge.eechelons.data;
+package mod.gottsch.neoforge.eechelons.core.data;
 
 import com.mojang.serialization.Codec;
-import mod.gottsch.neoforge.eechelons.EEchelons;
+import mod.gottsch.neoforge.eechelons.EEchelonsApiMod;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -30,10 +30,13 @@ import java.util.function.Supplier;
  * @author Mark Gottschling on 2/15/2025
  */
 public class ModDataAttachements {
-    private static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES = DeferredRegister.create(NeoForgeRegistries.Keys.ATTACHMENT_TYPES, EEchelons.MODID);
+    private static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES = DeferredRegister.create(NeoForgeRegistries.Keys.ATTACHMENT_TYPES, EEchelonsApiMod.MODID);
 
-    public static final Supplier<AttachmentType<Integer>> LEVEL = ATTACHMENT_TYPES.register(
-            "level", () -> AttachmentType.builder(() -> -1).serialize(Codec.INT).build());
+    public static final Supplier<AttachmentType<Integer>> DIFFICULTY = ATTACHMENT_TYPES.register(
+            "difficulty", () -> AttachmentType.builder(() -> -1).serialize(Codec.INT).build());
+
+    public static final Supplier<AttachmentType<String>> DIFFICULTY_NAME = ATTACHMENT_TYPES.register(
+            "difficultyName", () -> AttachmentType.builder(() -> "").serialize(Codec.STRING).build());
 
     public static void register(IEventBus eventBus) {
         ATTACHMENT_TYPES.register(eventBus);

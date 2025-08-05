@@ -1,6 +1,8 @@
 /*
  * This file is part of  Enemy Echelons.
  * Copyright (c) 2022 Mark Gottschling (gottsch)
+ * 
+ * All rights reserved.
  *
  * Enemy Echelons is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -15,20 +17,31 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with Enemy Echelons.  If not, see <http://www.gnu.org/licenses/lgpl>.
  */
-package mod.gottsch.neoforge.eechelons.setup;
+package mod.gottsch.neoforge.eechelons;
 
-import mod.gottsch.neoforge.eechelons.data.ModDataAttachements;
+import com.mojang.logging.LogUtils;
+import mod.gottsch.neoforge.eechelons.core.config.Config;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
+import org.slf4j.Logger;
 
 /**
- * 
+ * A Server-Side API.
  * @author Mark Gottschling on Jul 24, 2022
  *
  */
-public class Registration {
+@Mod(EEchelonsApiMod.MODID)
+public class EEchelonsApiMod {
+	public static final Logger LOGGER = LogUtils.getLogger();
+	public static final String MODID = "eechelonsapi";
 
-	public static void init(IEventBus eventBus) {
-		ModDataAttachements.register(eventBus);
+	/**
+	 * 
+	 */
+	public EEchelonsApiMod(IEventBus eventBus, ModContainer modContainer) {
+		// register the server config
+		modContainer.registerConfig(ModConfig.Type.COMMON, Config.COMMON_SPEC);
 	}
-
 }
