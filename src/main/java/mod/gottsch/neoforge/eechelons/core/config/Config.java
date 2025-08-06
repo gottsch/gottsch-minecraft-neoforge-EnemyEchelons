@@ -35,7 +35,7 @@ import java.util.List;
  * @author Mark Gottschling on Jul 25, 2022
  *
  */
-@EventBusSubscriber(modid = EEchelonsApiMod.MODID, bus = EventBusSubscriber.Bus.MOD)
+//@EventBusSubscriber(modid = EEchelonsApiMod.MODID, bus = EventBusSubscriber.Bus.MOD)
 public final class Config extends AbstractConfig {
 	public static final String CATEGORY_DIV = "##############################";
 	public static final String UNDERLINE_DIV = "------------------------------";

@@ -25,6 +25,7 @@ import mod.gottsch.neoforge.eechelons.core.data.ModDataAttachements;
 import mod.gottsch.neoforge.eechelons.core.echelon.EchelonManager;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
+import net.neoforged.fml.common.Mod;
 
 import java.util.List;
 import java.util.Optional;
@@ -75,6 +76,10 @@ public class EnemyEchelonsApi {
         return entity.getData(ModDataAttachements.DIFFICULTY);
     }
 
+    public static void setDifficulty(Entity entity, int difficulty) {
+        entity.setData(ModDataAttachements.DIFFICULTY, difficulty);
+    }
+
     public static boolean hasDifficultyNameAttachment(Entity entity) {
         return entity.hasData(ModDataAttachements.DIFFICULTY_NAME);
     }
@@ -82,5 +87,9 @@ public class EnemyEchelonsApi {
     public static Optional<String> getDifficultyName(Entity entity) {
         return Optional.of(entity.getData(ModDataAttachements.DIFFICULTY_NAME))
                 .filter(name -> !name.isBlank());
+    }
+
+    public static void setDifficultyName(Entity entity, String name) {
+        entity.setData(ModDataAttachements.DIFFICULTY_NAME, name);
     }
 }

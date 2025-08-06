@@ -21,6 +21,7 @@ package mod.gottsch.neoforge.eechelons;
 
 import com.mojang.logging.LogUtils;
 import mod.gottsch.neoforge.eechelons.core.config.Config;
+import mod.gottsch.neoforge.eechelons.core.data.ModDataAttachements;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -41,6 +42,7 @@ public class EEchelonsApiMod {
 	 * 
 	 */
 	public EEchelonsApiMod(IEventBus eventBus, ModContainer modContainer) {
+		ModDataAttachements.register(modContainer.getEventBus());
 		// register the server config
 		modContainer.registerConfig(ModConfig.Type.COMMON, Config.COMMON_SPEC);
 	}

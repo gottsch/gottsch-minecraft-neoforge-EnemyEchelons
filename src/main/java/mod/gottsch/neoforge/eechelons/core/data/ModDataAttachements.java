@@ -36,7 +36,7 @@ public class ModDataAttachements {
             "difficulty", () -> AttachmentType.builder(() -> -1).serialize(Codec.INT).build());
 
     public static final Supplier<AttachmentType<String>> DIFFICULTY_NAME = ATTACHMENT_TYPES.register(
-            "difficultyName", () -> AttachmentType.builder(() -> "").serialize(Codec.STRING).build());
+            "difficulty_name", () -> AttachmentType.builder(() -> "").serialize(Codec.STRING).build());
 
     public static void register(IEventBus eventBus) {
         ATTACHMENT_TYPES.register(eventBus);
