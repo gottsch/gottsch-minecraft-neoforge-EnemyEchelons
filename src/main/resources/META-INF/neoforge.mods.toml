@@ -15,7 +15,7 @@ license="LGPL v3"
 [[mods]] #mandatory
 
 # The modid of the mod
-modId="eechelonsapi" #mandatory
+modId="eechelonsapi_server" #mandatory
 
 # The version number of the mod
 version="1.21.1-1.4.0" #mandatory
@@ -24,7 +24,7 @@ version="1.21.1-1.4.0" #mandatory
 displayName="Enemy Echelons" #mandatory
 
 # A URL to query for updates for this mod. See the JSON update specification https://docs.neoforged.net/docs/misc/updatechecker/
-updateJSONURL="https://raw.githubusercontent.com/gottsch/gottsch-minecraft-neoforge-EnemyEchelons/1.21.1-main/update.json"
+updateJSONURL="https://raw.githubusercontent.com/gottsch/gottsch-minecraft-neoforge-EnemyEchelons/1.21.1-api-server/main/update.json"
 
 # A URL for the "homepage" for this mod, displayed in the mod UI
 displayURL="https://www.curseforge.com/minecraft/mc-mods/enemy-echelons" #optional
@@ -45,14 +45,13 @@ authors="gottsch" #optional
 # NONE means that no display test is set on your mod. You need to do this yourself, see IExtensionPoint.DisplayTest for more information. You can define any scheme you wish with this value.
 # IMPORTANT NOTE: this is NOT an instruction as to which environments (CLIENT or DEDICATED SERVER) your mod loads on. Your mod should load (and maybe do nothing!) whereever it finds itself.
 #displayTest="MATCH_VERSION" # MATCH_VERSION is the default if nothing is specified (#optional)
+# This is crucial for server-side only mods.
+displayTest="IGNORE_SERVER_VERSION"
 
 # The description text for the mod (multi line!) (#mandatory)
 description='''
 A mod that assigns levels and attribute modifications to mobs based on the world height range that they spawn at.
 '''
-
-# The side this mod is loaded on. Can be CLIENT, SERVER, or BOTH.
-side="SERVER" #mandatory for a server-side only mod
 
 # The [[mixins]] block allows you to declare your mixin config to FML so that it gets loaded.
 #[[mixins]]
@@ -66,7 +65,7 @@ side="SERVER" #mandatory for a server-side only mod
 # The coremods config file path is not configurable and is always loaded from META-INF/coremods.json
 
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
-[[dependencies.eechelonsapi]] #optional
+[[dependencies.eechelonsapi_server]] #optional
 # the modid of the dependency
 modId="neoforge" #mandatory
 # The type of the dependency. Can be one of "required", "optional", "incompatible" or "discouraged" (case insensitive).
@@ -85,7 +84,7 @@ ordering="NONE"
 side="BOTH"
 
 # Here's another dependency
-[[dependencies.eechelonsapi]]
+[[dependencies.eechelonsapi_server]]
 modId="minecraft"
 type="required"
 # This version range declares a minimum of the current minecraft version up to but not including the next major version
@@ -93,7 +92,7 @@ versionRange="[1.21.1]"
 ordering="NONE"
 side="BOTH"
 
-[[dependencies.eechelonsapi]]
+[[dependencies.eechelonsapi_server]]
 modId="gottschcore"
 type="required"
 # This version range declares a minimum of the current minecraft version up to but not including the next major version

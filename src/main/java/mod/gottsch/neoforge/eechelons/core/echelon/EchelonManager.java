@@ -1,28 +1,25 @@
 /*
- * This file is part of  Enemy Echelons.
- * Copyright (c) 2022 Mark Gottschling (gottsch)
+ * This file is part of  Enemy Echelons API.
+ * Copyright (c) 2025 Mark Gottschling (gottsch)
  *
- * All rights reserved.
+ * Enemy Echelons API is free software: you can redistribute it and/or modify
+ * it under the terms of the Open Software Licence 3.0.
  *
- * Enemy Echelons is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Enemy Echelons is distributed in the hope that it will be useful,
+ * Enemy Echelons API is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ * Open Software Licence 3.0 for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Enemy Echelons.  If not, see <http://www.gnu.org/licenses/lgpl>.
+ * You should have received a copy of the Open Software Licence
+ * along with Enemy Echelons.  If not, see <https://www.tldrlegal.com/license/open-software-licence-3-0>.
  */
 package mod.gottsch.neoforge.eechelons.core.echelon;
 
-import mod.gottsch.neoforge.eechelons.core.registry.EchelonRegistry;
 import mod.gottsch.neoforge.eechelons.EEchelonsApiMod;
 import mod.gottsch.neoforge.eechelons.core.config.EchelonConfigsHolder;
-import mod.gottsch.neoforge.eechelons.core.data.ModDataAttachements;
+import mod.gottsch.neoforge.eechelons.core.data.PersistentData;
+import mod.gottsch.neoforge.eechelons.core.registry.EchelonRegistry;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
@@ -42,6 +39,7 @@ public class EchelonManager {
 //	private static final String XP_REWARD_FIELDNAME = "xpReward"; //"f_21364_";
 //	private static final ResourceLocation ALL_DIMENSION = ResourceLocation.fromNamespaceAndPath(".", ".");
 
+
 	private static final int DIFFICULTY_NOT_SET = -1;
 
 	private static final ResourceLocation ECHELON_MAX_HEALTH_MODIFIER = ResourceLocation.fromNamespaceAndPath(EEchelonsApiMod.MODID, "max_health_modifier");
@@ -54,27 +52,6 @@ public class EchelonManager {
 	private static final ResourceLocation ECHELON_KNOCKBACK_RESISTANCE_MODIFIER = ResourceLocation.fromNamespaceAndPath(EEchelonsApiMod.MODID, "knockback_resistence_modifier");
 
 	public static final EchelonRegistry REGISTRY = new EchelonRegistry();
-	/*
-	 * map of echelons by id
-	 * currently not implemented in any meaningful way.
-	 */
-//	private static final Map<String, EchelonsHolder.Echelon> ECHELONS_BY_ID = Maps.newHashMap();
-//
-//	/*
-//	 * map of echelons by dimension
-//	 */
-//	private static final Multimap<ResourceLocation, Echelon> ECHELONS = ArrayListMultimap.create();
-//
-//	/*
-//	 * map of echelons by dimension-mod (namespace) pair
-//	 */
-//	private static final Map<Pair<ResourceLocation, String>, Echelon> ECHELONS_BY_MOD = Maps.newHashMap();
-//
-//	/*
-//	 * map of echelons by dimension-mob pair.
-//	 * this is for white-list mobs.
-//	 */
-//	private static final Map<Pair<ResourceLocation, ResourceLocation>, Echelon> ECHELONS_BY_MOB = Maps.newHashMap();
 
 	/**
 	 * @param entity
@@ -82,6 +59,35 @@ public class EchelonManager {
 	 */
 	public static boolean isValidEntity(final Entity entity) {
 		return entity instanceof Mob;
+	}
+
+	public static boolean hasDifficulty(Entity entity) {
+		return getData(entity).contains(PersistentData.DIFFICULTY);
+	}
+
+	public static Integer getDifficulty(Entity entity) {
+		return hasDifficulty(entity) ? getData(entity).getInt(PersistentData.DIFFICULTY) : -1;
+	}
+
+	public static void setDifficulty(Entity entity, int difficulty) {
+		CompoundTag tag = getData(entity);
+		tag.putInt(PersistentData.DIFFICULTY, difficulty);
+		setData(entity, tag);
+	}
+
+	public static boolean hasDifficultyName(Entity entity) {
+		return getData(entity).contains(PersistentData.DIFFICULTY_NAME);    }
+
+	public static Optional<String> getDifficultyName(Entity entity) {
+		return hasDifficultyName(entity)
+				? Optional.of(getData(entity).getString(PersistentData.DIFFICULTY_NAME))
+				: Optional.empty();
+	}
+
+	public static void setDifficultyName(Entity entity, String name) {
+		CompoundTag tag = getData(entity);
+		tag.putString(PersistentData.DIFFICULTY_NAME, name);
+		setData(entity, tag);
 	}
 
 	/*
@@ -103,11 +109,8 @@ public class EchelonManager {
 	 * like to directly select an echelon to apply to a programmatically spawned mob.
 	 */
 	public static void applyModifications(EchelonRegistry registry, Mob mob, ResourceLocation echelonId, Integer selectedDifficulty) {
-		if (!mob.hasData(ModDataAttachements.DIFFICULTY)) {
-			return;
-		}
 
-		Integer currentDifficulty = mob.getData(ModDataAttachements.DIFFICULTY);
+		Integer currentDifficulty = getDifficulty(mob);
 
 		// check if mob capability values have already been set
 		if (currentDifficulty > DIFFICULTY_NOT_SET) {
@@ -118,7 +121,7 @@ public class EchelonManager {
 		Optional<EchelonConfigsHolder.Config> echelonConfig = registry.getEchelonConfig(mob);
 
 		if (echelonConfig.isEmpty()) {
-			mob.setData(ModDataAttachements.DIFFICULTY, 0);
+			setDifficulty(mob, 0);
 			return;
 		}
 
@@ -148,18 +151,14 @@ public class EchelonManager {
 	 * @param selectedDifficulty
 	 */
 	public static void applyModifications(EchelonRegistry registry, Mob mob, Integer selectedDifficulty) {
-
-		if (!mob.hasData(ModDataAttachements.DIFFICULTY)) {
-			return;
-		}
-
-		Integer currentDifficulty = mob.getData(ModDataAttachements.DIFFICULTY);
-
+//		EEchelonsApiMod.LOGGER.info("applying modification -> {} with difficulty -> {}", mob.getName().getString(), selectedDifficulty);
+		// either fetch difficulty or default to -1
+		Integer currentDifficulty = getDifficulty(mob);
+//		EEchelonsApiMod.LOGGER.info("new difficulty -> {}", currentDifficulty);
 		// check if mob capability values have already been set
 		if (currentDifficulty > DIFFICULTY_NOT_SET) {
 			return;
 		}
-
 
 		// determine the altitude (y-value)
 		int y = mob.getBlockY();
@@ -170,14 +169,14 @@ public class EchelonManager {
 		Optional<EchelonConfigsHolder.Config> echelonConfig = registry.getEchelonConfig(mob);
 
 		if (echelonConfig.isEmpty()) {
-			mob.setData(ModDataAttachements.DIFFICULTY, 0);
+			setDifficulty(mob, 0);
 			return;
 		}
 
 		// select the difficulty from the config if not provided (default behavior)
 		if (selectedDifficulty == DIFFICULTY_NOT_SET) {
 			selectedDifficulty = echelonConfig.get().getDifficulty(y);
-//				EEchelons.LOGGER.debug("selected difficulty -> {} for dimension -> {} @ y -> {}", echelonLevel, dimension, y);
+//				EEchelonsApiMod.LOGGER.info("selected difficulty -> {} @ y -> {}", selectedDifficulty, y);
 		}
 
 		applyModifications(echelonConfig.get(), mob, selectedDifficulty);
@@ -190,8 +189,7 @@ public class EchelonManager {
 	public static void applyModifications(EchelonConfigsHolder.Config config, Mob mob, Integer selectedDifficulty) {
 		Integer echelonDifficulty = -1;
 
-		if (mob.hasData(ModDataAttachements.DIFFICULTY)) {
-
+		if (hasDifficulty(mob)) {
 			// health
 			modifyHealth(mob, selectedDifficulty, config);
 
@@ -218,7 +216,7 @@ public class EchelonManager {
 //			modifyXp(mob, echelonLevel, echelon.get());
 
 			// update the data
-			mob.setData(ModDataAttachements.DIFFICULTY, selectedDifficulty);
+			setDifficulty(mob, selectedDifficulty);
 		}
 	}
 
@@ -411,5 +409,13 @@ public class EchelonManager {
 				//			EEchelons.LOGGER.debug("mob new knockback resist -> {}", mob.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE));
 			}
 		}
+	}
+
+	private static CompoundTag getData(Entity entity) {
+		return entity.getPersistentData().getCompound(EEchelonsApiMod.MODID);
+	}
+
+	private static void setData(Entity entity, CompoundTag tag) {
+		entity.getPersistentData().put(EEchelonsApiMod.MODID, tag);
 	}
 }

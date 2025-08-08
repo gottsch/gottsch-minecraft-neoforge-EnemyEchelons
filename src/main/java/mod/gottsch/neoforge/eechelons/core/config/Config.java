@@ -1,29 +1,23 @@
 /*
  * This file is part of  Enemy Echelons API.
- * Copyright (c) 2022 Mark Gottschling (gottsch)
- *
- * All rights reserved.
+ * Copyright (c) 2025 Mark Gottschling (gottsch)
  *
  * Enemy Echelons API is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the Open Software Licence 3.0.
  *
  * Enemy Echelons API is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ * Open Software Licence 3.0 for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Enemy Echelons API.  If not, see <http://www.gnu.org/licenses/lgpl>.
+ * You should have received a copy of the Open Software Licence
+ * along with Enemy Echelons.  If not, see <https://www.tldrlegal.com/license/open-software-licence-3-0>.
  */
 package mod.gottsch.neoforge.eechelons.core.config;
 
 import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.conversion.ObjectConverter;
 import mod.gottsch.neo.gottschcore.config.AbstractConfig;
-import mod.gottsch.neoforge.eechelons.EEchelonsApiMod;
-import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -35,26 +29,25 @@ import java.util.List;
  * @author Mark Gottschling on Jul 25, 2022
  *
  */
-//@EventBusSubscriber(modid = EEchelonsApiMod.MODID, bus = EventBusSubscriber.Bus.MOD)
 public final class Config extends AbstractConfig {
 	public static final String CATEGORY_DIV = "##############################";
 	public static final String UNDERLINE_DIV = "------------------------------";
 
-	public static final ModConfigSpec COMMON_SPEC;
-	public static final CommonConfig COMMON;
+	public static final ModConfigSpec SERVER_SPEC;
+	public static final ServerConfig SERVER;
 
 	public static Config instance = new Config();
 	
 	static {
-		final Pair<CommonConfig, ModConfigSpec> commonSpecPair = new ModConfigSpec.Builder()
-				.configure(CommonConfig::new);
-		COMMON_SPEC = commonSpecPair.getRight();
-		COMMON = commonSpecPair.getLeft();
+		final Pair<ServerConfig, ModConfigSpec> serverSpecPair = new ModConfigSpec.Builder()
+				.configure(ServerConfig::new);
+		SERVER_SPEC = serverSpecPair.getRight();
+		SERVER = serverSpecPair.getLeft();
 	}
 
-	public static class CommonConfig {
+	public static class ServerConfig {
 		public final Logging logging;
-		public CommonConfig(ModConfigSpec.Builder builder) {
+		public ServerConfig(ModConfigSpec.Builder builder) {
 			logging = new Logging(builder);
 		}
 	}
@@ -137,15 +130,15 @@ public final class Config extends AbstractConfig {
 
 	@Override
 	public String getLogsFolder() {
-		return COMMON.logging.folder.get();
+		return SERVER.logging.folder.get();
 	}
 	
 	public void setLogsFolder(String folder) {
-		COMMON.logging.folder.set(folder);
+		SERVER.logging.folder.set(folder);
 	}
 	
 	@Override
 	public String getLoggingLevel() {
-		return COMMON.logging.level.get();
+		return SERVER.logging.level.get();
 	}
 }

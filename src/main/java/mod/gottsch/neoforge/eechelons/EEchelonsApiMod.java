@@ -1,27 +1,22 @@
 /*
- * This file is part of  Enemy Echelons.
- * Copyright (c) 2022 Mark Gottschling (gottsch)
- * 
- * All rights reserved.
+ * This file is part of  Enemy Echelons API.
+ * Copyright (c) 2025 Mark Gottschling (gottsch)
  *
- * Enemy Echelons is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Enemy Echelons API is free software: you can redistribute it and/or modify
+ * it under the terms of the Open Software Licence 3.0.
  *
- * Enemy Echelons is distributed in the hope that it will be useful,
+ * Enemy Echelons API is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ * Open Software Licence 3.0 for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Enemy Echelons.  If not, see <http://www.gnu.org/licenses/lgpl>.
+ * You should have received a copy of the Open Software Licence
+ * along with Enemy Echelons.  If not, see <https://www.tldrlegal.com/license/open-software-licence-3-0>.
  */
 package mod.gottsch.neoforge.eechelons;
 
 import com.mojang.logging.LogUtils;
 import mod.gottsch.neoforge.eechelons.core.config.Config;
-import mod.gottsch.neoforge.eechelons.core.data.ModDataAttachements;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -36,14 +31,13 @@ import org.slf4j.Logger;
 @Mod(EEchelonsApiMod.MODID)
 public class EEchelonsApiMod {
 	public static final Logger LOGGER = LogUtils.getLogger();
-	public static final String MODID = "eechelonsapi";
+	public static final String MODID = "eechelonsapi_server";
 
 	/**
 	 * 
 	 */
 	public EEchelonsApiMod(IEventBus eventBus, ModContainer modContainer) {
-		ModDataAttachements.register(modContainer.getEventBus());
 		// register the server config
-		modContainer.registerConfig(ModConfig.Type.COMMON, Config.COMMON_SPEC);
+		modContainer.registerConfig(ModConfig.Type.SERVER, Config.SERVER_SPEC);
 	}
 }
