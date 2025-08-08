@@ -18,13 +18,13 @@ license="LGPL v3"
 modId="eechelonsapi_server" #mandatory
 
 # The version number of the mod
-version="1.21.1-1.4.0" #mandatory
+version="${mod_version}" #mandatory
 
 # A display name for the mod
 displayName="Enemy Echelons" #mandatory
 
 # A URL to query for updates for this mod. See the JSON update specification https://docs.neoforged.net/docs/misc/updatechecker/
-updateJSONURL="https://raw.githubusercontent.com/gottsch/gottsch-minecraft-neoforge-EnemyEchelons/1.21.1-api-server/main/update.json"
+updateJSONURL="https://raw.githubusercontent.com/gottsch/gottsch-minecraft-neoforge-EnemyEchelons/1.21.1-api-server-main/update.json"
 
 # A URL for the "homepage" for this mod, displayed in the mod UI
 displayURL="https://www.curseforge.com/minecraft/mc-mods/enemy-echelons" #optional
