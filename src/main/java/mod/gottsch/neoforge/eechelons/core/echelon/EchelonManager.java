@@ -1,28 +1,25 @@
 /*
- * This file is part of  Enemy Echelons.
- * Copyright (c) 2022 Mark Gottschling (gottsch)
+ * This file is part of  Enemy Echelons API.
+ * Copyright (c) 2025 Mark Gottschling (gottsch)
  *
- * All rights reserved.
+ * Enemy Echelons API is free software: you can redistribute it and/or modify
+ * it under the terms of the Open Software Licence 3.0.
  *
- * Enemy Echelons is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Enemy Echelons is distributed in the hope that it will be useful,
+ * Enemy Echelons API is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ * Open Software Licence 3.0 for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Enemy Echelons.  If not, see <http://www.gnu.org/licenses/lgpl>.
+ * You should have received a copy of the Open Software Licence
+ * along with Enemy Echelons.  If not, see <https://www.tldrlegal.com/license/open-software-licence-3-0>.
  */
 package mod.gottsch.neoforge.eechelons.core.echelon;
 
-import mod.gottsch.neoforge.eechelons.core.registry.EchelonRegistry;
 import mod.gottsch.neoforge.eechelons.EEchelonsApiMod;
 import mod.gottsch.neoforge.eechelons.core.config.EchelonConfigsHolder;
 import mod.gottsch.neoforge.eechelons.core.data.ModDataAttachements;
+import mod.gottsch.neoforge.eechelons.core.registry.DifficultyNameRegistry;
+import mod.gottsch.neoforge.eechelons.core.registry.EchelonRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
@@ -38,9 +35,6 @@ import java.util.Optional;
  *
  */
 public class EchelonManager {
-	// f_21364_ => xpReward
-//	private static final String XP_REWARD_FIELDNAME = "xpReward"; //"f_21364_";
-//	private static final ResourceLocation ALL_DIMENSION = ResourceLocation.fromNamespaceAndPath(".", ".");
 
 	private static final int DIFFICULTY_NOT_SET = -1;
 
@@ -54,27 +48,6 @@ public class EchelonManager {
 	private static final ResourceLocation ECHELON_KNOCKBACK_RESISTANCE_MODIFIER = ResourceLocation.fromNamespaceAndPath(EEchelonsApiMod.MODID, "knockback_resistence_modifier");
 
 	public static final EchelonRegistry REGISTRY = new EchelonRegistry();
-	/*
-	 * map of echelons by id
-	 * currently not implemented in any meaningful way.
-	 */
-//	private static final Map<String, EchelonsHolder.Echelon> ECHELONS_BY_ID = Maps.newHashMap();
-//
-//	/*
-//	 * map of echelons by dimension
-//	 */
-//	private static final Multimap<ResourceLocation, Echelon> ECHELONS = ArrayListMultimap.create();
-//
-//	/*
-//	 * map of echelons by dimension-mod (namespace) pair
-//	 */
-//	private static final Map<Pair<ResourceLocation, String>, Echelon> ECHELONS_BY_MOD = Maps.newHashMap();
-//
-//	/*
-//	 * map of echelons by dimension-mob pair.
-//	 * this is for white-list mobs.
-//	 */
-//	private static final Map<Pair<ResourceLocation, ResourceLocation>, Echelon> ECHELONS_BY_MOB = Maps.newHashMap();
 
 	/**
 	 * @param entity
@@ -82,6 +55,31 @@ public class EchelonManager {
 	 */
 	public static boolean isValidEntity(final Entity entity) {
 		return entity instanceof Mob;
+	}
+
+	public static boolean hasDifficulty(Entity entity) {
+		return entity.hasData(ModDataAttachements.DIFFICULTY);
+	}
+
+	public static Integer getDifficulty(Entity entity) {
+		return entity.getData(ModDataAttachements.DIFFICULTY);
+	}
+
+	public static void setDifficulty(Entity entity, int difficulty) {
+		entity.setData(ModDataAttachements.DIFFICULTY, difficulty);
+	}
+
+	public static boolean hasDifficultyName(Entity entity) {
+		return entity.hasData(ModDataAttachements.DIFFICULTY_NAME);
+	}
+
+	public static Optional<String> getDifficultyName(Entity entity) {
+		return Optional.of(entity.getData(ModDataAttachements.DIFFICULTY_NAME))
+				.filter(name -> !name.isBlank());
+	}
+
+	public static void setDifficultyName(Entity entity, String name) {
+		entity.setData(ModDataAttachements.DIFFICULTY_NAME, name);
 	}
 
 	/*
@@ -103,11 +101,11 @@ public class EchelonManager {
 	 * like to directly select an echelon to apply to a programmatically spawned mob.
 	 */
 	public static void applyModifications(EchelonRegistry registry, Mob mob, ResourceLocation echelonId, Integer selectedDifficulty) {
-		if (!mob.hasData(ModDataAttachements.DIFFICULTY)) {
+		if (!hasDifficulty(mob)) {
 			return;
 		}
 
-		Integer currentDifficulty = mob.getData(ModDataAttachements.DIFFICULTY);
+		Integer currentDifficulty = getDifficulty(mob);
 
 		// check if mob capability values have already been set
 		if (currentDifficulty > DIFFICULTY_NOT_SET) {
@@ -118,7 +116,7 @@ public class EchelonManager {
 		Optional<EchelonConfigsHolder.Config> echelonConfig = registry.getEchelonConfig(mob);
 
 		if (echelonConfig.isEmpty()) {
-			mob.setData(ModDataAttachements.DIFFICULTY, 0);
+			setDifficulty(mob, 0);
 			return;
 		}
 
@@ -149,17 +147,16 @@ public class EchelonManager {
 	 */
 	public static void applyModifications(EchelonRegistry registry, Mob mob, Integer selectedDifficulty) {
 
-		if (!mob.hasData(ModDataAttachements.DIFFICULTY)) {
+		if (!hasDifficulty(mob)) {
 			return;
 		}
 
-		Integer currentDifficulty = mob.getData(ModDataAttachements.DIFFICULTY);
+		Integer currentDifficulty = getDifficulty(mob);
 
 		// check if mob capability values have already been set
 		if (currentDifficulty > DIFFICULTY_NOT_SET) {
 			return;
 		}
-
 
 		// determine the altitude (y-value)
 		int y = mob.getBlockY();
@@ -170,7 +167,7 @@ public class EchelonManager {
 		Optional<EchelonConfigsHolder.Config> echelonConfig = registry.getEchelonConfig(mob);
 
 		if (echelonConfig.isEmpty()) {
-			mob.setData(ModDataAttachements.DIFFICULTY, 0);
+			setDifficulty(mob, 0);
 			return;
 		}
 
@@ -190,7 +187,7 @@ public class EchelonManager {
 	public static void applyModifications(EchelonConfigsHolder.Config config, Mob mob, Integer selectedDifficulty) {
 		Integer echelonDifficulty = -1;
 
-		if (mob.hasData(ModDataAttachements.DIFFICULTY)) {
+		if (hasDifficulty(mob)) {
 
 			// health
 			modifyHealth(mob, selectedDifficulty, config);
@@ -213,12 +210,12 @@ public class EchelonManager {
 			// speed
 			modifySpeed(mob, selectedDifficulty, config);
 
-			// experience
-			// NOTE this is handled by the LivingExperienceDropEvent
-//			modifyXp(mob, echelonLevel, echelon.get());
-
 			// update the data
-			mob.setData(ModDataAttachements.DIFFICULTY, selectedDifficulty);
+			setDifficulty(mob, selectedDifficulty);
+
+			DifficultyNameRegistry.getDifficultyName(mob, selectedDifficulty).ifPresent(name -> {
+				setDifficultyName(mob, name);
+			});
 		}
 	}
 
@@ -264,22 +261,6 @@ public class EchelonManager {
 			}
 		}
 	}
-
-//    private static void modifyXp(Mob mob, Integer difficulty, Config echelon) {
-//        if (echelon.hasXpFactor()) {
-//            double xp = 1.0 + (echelon.getXpFactor() * difficulty);
-//            try {
-//                int xpReward = (int) ObfuscationReflectionHelper.getPrivateValue(Mob.class, mob, XP_REWARD_FIELDNAME);
-//                double newXpReward = xpReward * xp;
-//                if (echelon.getMaxXp() != null) {
-//                    newXpReward = Math.min(newXpReward, echelon.getMaxXp());
-//                }
-//                ObfuscationReflectionHelper.setPrivateValue(Mob.class, mob, (int) newXpReward, XP_REWARD_FIELDNAME);
-//            } catch (UnableToAccessFieldException e) {
-//                return;
-//            }
-//        }
-//    }
 
 	private static void modifyHealth(Mob mob, int difficulty, EchelonConfigsHolder.Config config) {
 		if (config.hasHpFactor()) {

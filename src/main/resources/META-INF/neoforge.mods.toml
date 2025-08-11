@@ -6,7 +6,7 @@ loaderVersion="[1,)" #mandatory
 
 # The license for you mod. This is mandatory metadata and allows for easier comprehension of your redistributive properties.
 # Review your options at https://choosealicense.com/. All rights reserved is the default copyright stance, and is thus the default here.
-license="LGPL v3"
+license="OSL-3.0"
 
 # A URL to refer people to when problems occur with this mod
 #issueTrackerURL="https://change.me.to.your.issue.tracker.example.invalid/" #optional
@@ -18,13 +18,13 @@ license="LGPL v3"
 modId="eechelonsapi" #mandatory
 
 # The version number of the mod
-version="1.21.1-1.4.0" #mandatory
+version="1.21.1-1.0.0" #mandatory
 
 # A display name for the mod
 displayName="Enemy Echelons" #mandatory
 
 # A URL to query for updates for this mod. See the JSON update specification https://docs.neoforged.net/docs/misc/updatechecker/
-updateJSONURL="https://raw.githubusercontent.com/gottsch/gottsch-minecraft-neoforge-EnemyEchelons/1.21.1-main/update.json"
+updateJSONURL="https://raw.githubusercontent.com/gottsch/gottsch-minecraft-neoforge-EnemyEchelons/1.21.1-api-main/update.json"
 
 # A URL for the "homepage" for this mod, displayed in the mod UI
 displayURL="https://www.curseforge.com/minecraft/mc-mods/enemy-echelons" #optional
@@ -50,9 +50,6 @@ authors="gottsch" #optional
 description='''
 A mod that assigns levels and attribute modifications to mobs based on the world height range that they spawn at.
 '''
-
-# The side this mod is loaded on. Can be CLIENT, SERVER, or BOTH.
-side="SERVER" #mandatory for a server-side only mod
 
 # The [[mixins]] block allows you to declare your mixin config to FML so that it gets loaded.
 #[[mixins]]
@@ -99,7 +96,7 @@ type="required"
 # This version range declares a minimum of the current minecraft version up to but not including the next major version
 versionRange="[1.21.1-2.5.0, 1.21.1-3.0.0]"
 ordering="BEFORE"
-side="SERVER"
+side="BOTH"
 
 # Features are specific properties of the game environment, that you may want to declare you require. This example declares
 # that your mod requires GL version 3.2 or higher. Other features will be added. They are side aware so declaring this won't

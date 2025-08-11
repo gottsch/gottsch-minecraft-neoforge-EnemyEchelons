@@ -8,3 +8,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0] - 2025-08-02
 
 Initial Release.
+Uses Open Software License v. 3.0 (OSL-3.0) insetad of LGNU 3.0

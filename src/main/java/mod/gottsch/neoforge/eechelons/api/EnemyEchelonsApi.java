@@ -2,30 +2,24 @@
  * This file is part of  Enemy Echelons API.
  * Copyright (c) 2025 Mark Gottschling (gottsch)
  *
- * All rights reserved.
- *
  * Enemy Echelons API is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the Open Software Licence 3.0.
  *
  * Enemy Echelons API is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ * Open Software Licence 3.0 for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Enemy Echelons API.  If not, see <http://www.gnu.org/licenses/lgpl>.
+ * You should have received a copy of the Open Software Licence
+ * along with Enemy Echelons.  If not, see <https://www.tldrlegal.com/license/open-software-licence-3-0>.
  */
 package mod.gottsch.neoforge.eechelons.api;
 
-import mod.gottsch.neoforge.eechelons.core.registry.EchelonRegistry;
 import mod.gottsch.neoforge.eechelons.core.config.EchelonConfigsHolder;
-import mod.gottsch.neoforge.eechelons.core.data.ModDataAttachements;
 import mod.gottsch.neoforge.eechelons.core.echelon.EchelonManager;
+import mod.gottsch.neoforge.eechelons.core.registry.EchelonRegistry;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
-import net.neoforged.fml.common.Mod;
 
 import java.util.List;
 import java.util.Optional;
@@ -68,28 +62,27 @@ public class EnemyEchelonsApi {
         return EchelonManager.isValidEntity(entity);
     }
 
-    public static boolean hasDifficultyAttachment(Entity entity) {
-        return entity.hasData(ModDataAttachements.DIFFICULTY);
+    public static boolean hasDifficulty(Entity entity) {
+        return EchelonManager.hasDifficulty(entity);
     }
 
     public static Integer getDifficulty(Entity entity) {
-        return entity.getData(ModDataAttachements.DIFFICULTY);
+        return EchelonManager.getDifficulty(entity);
     }
 
     public static void setDifficulty(Entity entity, int difficulty) {
-        entity.setData(ModDataAttachements.DIFFICULTY, difficulty);
+        EchelonManager.setDifficulty(entity, difficulty);
     }
 
-    public static boolean hasDifficultyNameAttachment(Entity entity) {
-        return entity.hasData(ModDataAttachements.DIFFICULTY_NAME);
+    public static boolean hasDifficultyName(Entity entity) {
+        return EchelonManager.hasDifficultyName(entity);
     }
 
     public static Optional<String> getDifficultyName(Entity entity) {
-        return Optional.of(entity.getData(ModDataAttachements.DIFFICULTY_NAME))
-                .filter(name -> !name.isBlank());
+        return EchelonManager.getDifficultyName(entity);
     }
 
-    public static void setDifficultyName(Entity entity, String name) {
-        entity.setData(ModDataAttachements.DIFFICULTY_NAME, name);
+    public static void setDifficultyName(Entity entity, String difficultyName) {
+        EchelonManager.setDifficultyName(entity, difficultyName);
     }
 }
