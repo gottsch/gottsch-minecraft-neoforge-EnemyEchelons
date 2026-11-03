@@ -62,6 +62,17 @@ public class EnemyEchelonsApi {
         return EchelonManager.isValidEntity(entity);
     }
 
+    /**
+     * Whether the entity can carry a difficulty (any Mob), as the Forge API's hasDifficultyCapability().
+     * Use this, not hasDifficulty(), to decide whether apply() can act on a freshly spawned mob.
+     */
+    public static boolean hasDifficultyCapability(Entity entity) {
+        return EchelonManager.hasDifficultyCapability(entity);
+    }
+
+    /**
+     * Whether a difficulty has been written to the entity. false on a freshly spawned mob.
+     */
     public static boolean hasDifficulty(Entity entity) {
         return EchelonManager.hasDifficulty(entity);
     }
