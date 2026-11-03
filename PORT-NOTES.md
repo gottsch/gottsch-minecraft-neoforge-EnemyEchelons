@@ -1,4 +1,4 @@
-# Port notes: Enemy Echelons API 1.21.1-1.1.0 (NeoForge)
+# Port notes: Enemy Echelons API 1.1.0 (NeoForge 1.21.1)
 
 Branch `1.21.1-api-feature/1.1.0`, off `1.21.1-api-main` (1.21.1-1.0.0).
 Source: the Forge API `gottsch-minecraft-EnemyEchelons`, branch `1.20.1-api-main` at 1.1.0
@@ -9,7 +9,14 @@ only. Work through "Compile and test locally" below before merging.
 
 ## Version numbers
 
-- `mod_version` is `1.21.1-1.1.0`, matching the Forge API's 1.1.0.
+- `mod_version` is `1.1.0`, matching the Forge API's 1.1.0. It follows the scheme GottschCore moved to at 2.6.0:
+  a plain version, with the Minecraft version in the artifact name instead. `archives_base_name` is now
+  `eechelonsapi-neoforge-1.21.1`, so the Maven coordinate is `gottsch:eechelonsapi-neoforge-1.21.1:1.1.0`
+  (was `gottsch:eechelonsapi-neoforge:1.21.1-1.0.0`), and the jar is `eechelonsapi-neoforge-1.21.1-1.1.0.jar`.
+- **Version ordering across the rename:** NeoForge compares versions piece by piece, so `1.1.0` sorts *below*
+  `1.21.1-1.0.0` (1 < 21 in the second piece). A consumer range such as `[1.21.1-1.0.0,)` rejects 1.1.0, and the
+  update checker will not tell 1.21.1-1.0.0 users that 1.1.0 is newer. Write consumer ranges in the new form,
+  ex. `[1.1.0,2.0.0)` in Dungeons2. GottschCore accepted the same break at 2.6.0.
 - Your local checkout (`neoforge-EnemyEchelonsAPI-1.21.1`) has an uncommitted `1.21.1-1.0.1` bump
   (CHANGELOG, `build.gradle`, `gradle.properties`, `neoforge.mods.toml`, `update.json`). It isn't on GitHub.
   This branch skips 1.0.1. Its one change (GottschCore `[2.7.0,3.0.0)` and the
@@ -96,5 +103,5 @@ Things that look right but are worth a look:
    `/reload` and `/eechelons dump`, and check that the exclusions and the `load_order` ordering show up.
 6. Spawn a zombie in a configured range. Check that it gets a difficulty and modifiers (fix 1). Also check a
    flying mob, ex. a bee or parrot, gets its flying speed modifier with no "Modifier is already applied" error.
-7. `./gradlew publishAll`, then wire up Dungeons2's `EchelonsIntegration` against `1.21.1-1.1.0` and restore
+7. `./gradlew publishAll`, then wire up Dungeons2's `EchelonsIntegration` against `gottsch:eechelonsapi-neoforge-1.21.1:1.1.0` and restore
    its optional `eechelonsapi` dependency (its `neoforge.mods.toml` has a `TODO port` for it).

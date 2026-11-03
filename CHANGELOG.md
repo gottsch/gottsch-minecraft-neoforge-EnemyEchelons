@@ -33,6 +33,7 @@ Brings the NeoForge API up to the Forge 1.20.1 API 1.1.0.
 
 ### Changed
 - Requires GottschCore 2.7.0 or newer (`[2.7.0,3.0.0)`). GottschCore's version format changed from `1.21.1-2.x.x` to `2.x.x`, which the old range rejected. GottschCore now loads before this mod (`ordering="AFTER"`).
+- The version scheme follows GottschCore's: the version is now `1.1.0` (was `1.21.1-1.0.0`), and the Maven artifact is `eechelonsapi-neoforge-1.21.1` (was `eechelonsapi-neoforge`). NeoForge sorts `1.1.0` below `1.21.1-1.0.0`, so a dependency range must use the new form, ex. `[1.1.0,2.0.0)`.
 - None of the existing public API changed.
 
 ## [1.0.0] - 2025-08-02
