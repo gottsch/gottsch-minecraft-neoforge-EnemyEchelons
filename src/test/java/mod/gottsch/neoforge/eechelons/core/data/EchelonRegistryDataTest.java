@@ -68,7 +68,7 @@ public class EchelonRegistryDataTest {
     }
 
     private static EchelonConfigsHolder.Config dataConfig(String id, String json) {
-        return EchelonDataCodecs.decodeEchelonConfig(ResourceLocation.fromNamespaceAndPath(id), JsonParser.parseString(json));
+        return EchelonDataCodecs.decodeEchelonConfig(ResourceLocation.parse(id), JsonParser.parseString(json));
     }
 
     private static String echelons(int difficulty) {
