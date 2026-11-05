@@ -41,6 +41,9 @@ public class DifficultyNameRegistryEntry {
     // ie Map<Difficulty, Name>
     private Map<Integer, String> difficultyNames;
 
+    // if no loadOrder is provided, defaults to 99 (low precedence)
+    private Integer loadOrder;
+
     public DifficultyNameRegistryEntry() {
 
     }
@@ -52,8 +55,9 @@ public class DifficultyNameRegistryEntry {
         }
 
         this.id = ResourceLocation.parse(config.getId());
-        config.getMobBlacklist().forEach(s -> this.getMobBlacklist().add(ResourceLocation.parse(s)));
-        config.getMobWhitelist().forEach(s -> this.getMobWhitelist().add(ResourceLocation.parse(s)));
+        this.loadOrder = config.getLoadOrder();
+        addMobs(config.getMobBlacklist(), getMobBlacklist(), getModBlacklist());
+        addMobs(config.getMobWhitelist(), getMobWhitelist(), getModWhitelist());
         if (!config.getModBlacklist().isEmpty()) {
             getModBlacklist().addAll(config.getModBlacklist());
         }
@@ -66,12 +70,31 @@ public class DifficultyNameRegistryEntry {
 
     }
 
+    /*
+     * a mob wildcard, ex. "minecraft:*", isn't a valid resource location, so it is moved to the mod list.
+     * an invalid mob id is skipped with a warning rather than failing the whole config.
+     */
+    private void addMobs(List<String> source, List<ResourceLocation> mobs, List<String> mods) {
+        source.forEach(mob -> {
+            if (mob.endsWith(":*")) {
+                mods.add(mob.substring(0, mob.indexOf(":")));
+                return;
+            }
+            ResourceLocation mobId = ResourceLocation.tryParse(mob);
+            if (mobId == null) {
+                EEchelonsApiMod.LOGGER.warn("Difficulty Naming Config -> {} has an invalid mob id -> {}, skipping it", id, mob);
+            } else {
+                mobs.add(mobId);
+            }
+        });
+    }
+
     public Optional<String> getDifficultyName(Integer difficulty) {
         return Optional.ofNullable(difficultyNames.get(difficulty));
     }
 
     public void registerDifficultyName(Integer difficulty, String name) {
-        this.difficultyNames.put(difficulty, name);
+        getDifficultyNames().put(difficulty, name);
     }
 
     public Map<Integer, String> getDifficultyNames() {
@@ -135,5 +158,13 @@ public class DifficultyNameRegistryEntry {
 
     public void setModWhitelist(List<String> modWhitelist) {
         this.modWhitelist = modWhitelist;
+    }
+
+    public Integer getLoadOrder() {
+        return loadOrder == null ? 99 : loadOrder;
+    }
+
+    public void setLoadOrder(Integer loadOrder) {
+        this.loadOrder = loadOrder;
     }
 }

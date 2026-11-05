@@ -57,6 +57,21 @@ public class EchelonManager {
 		return entity instanceof Mob;
 	}
 
+	/**
+	 * Whether the entity can carry a difficulty: the counterpart of the Forge API's difficulty capability,
+	 * which was attached to every valid entity. Unlike {@link #hasDifficulty(Entity)}, it does not depend on
+	 * the attachment having been written yet.
+	 * @param entity
+	 * @return
+	 */
+	public static boolean hasDifficultyCapability(Entity entity) {
+		return isValidEntity(entity);
+	}
+
+	/**
+	 * @param entity
+	 * @return whether a difficulty has been written to the entity. false on a freshly spawned mob.
+	 */
 	public static boolean hasDifficulty(Entity entity) {
 		return entity.hasData(ModDataAttachements.DIFFICULTY);
 	}
@@ -101,7 +116,9 @@ public class EchelonManager {
 	 * like to directly select an echelon to apply to a programmatically spawned mob.
 	 */
 	public static void applyModifications(EchelonRegistry registry, Mob mob, ResourceLocation echelonId, Integer selectedDifficulty) {
-		if (!hasDifficulty(mob)) {
+		// NOTE was hasDifficulty(), which is false until the attachment is first written, so nothing was ever
+		// applied. getData() creates the attachment with its default of DIFFICULTY_NOT_SET.
+		if (!hasDifficultyCapability(mob)) {
 			return;
 		}
 
@@ -109,6 +126,11 @@ public class EchelonManager {
 
 		// check if mob capability values have already been set
 		if (currentDifficulty > DIFFICULTY_NOT_SET) {
+			return;
+		}
+
+		// an excluded mob is left unset (not 0) so that another registry may still apply to it
+		if (registry.isExcluded(mob)) {
 			return;
 		}
 
@@ -147,7 +169,9 @@ public class EchelonManager {
 	 */
 	public static void applyModifications(EchelonRegistry registry, Mob mob, Integer selectedDifficulty) {
 
-		if (!hasDifficulty(mob)) {
+		// NOTE was hasDifficulty(), which is false until the attachment is first written, so nothing was ever
+		// applied. getData() creates the attachment with its default of DIFFICULTY_NOT_SET.
+		if (!hasDifficultyCapability(mob)) {
 			return;
 		}
 
@@ -155,6 +179,11 @@ public class EchelonManager {
 
 		// check if mob capability values have already been set
 		if (currentDifficulty > DIFFICULTY_NOT_SET) {
+			return;
+		}
+
+		// an excluded mob is left unset (not 0) so that another registry may still apply to it
+		if (registry.isExcluded(mob)) {
 			return;
 		}
 
@@ -187,7 +216,7 @@ public class EchelonManager {
 	public static void applyModifications(EchelonConfigsHolder.Config config, Mob mob, Integer selectedDifficulty) {
 		Integer echelonDifficulty = -1;
 
-		if (hasDifficulty(mob)) {
+		if (hasDifficultyCapability(mob)) {
 
 			// health
 			modifyHealth(mob, selectedDifficulty, config);
@@ -209,6 +238,9 @@ public class EchelonManager {
 
 			// speed
 			modifySpeed(mob, selectedDifficulty, config);
+
+			// fly speed
+			modifyFlyingSpeed(mob, selectedDifficulty, config);
 
 			// update the data
 			setDifficulty(mob, selectedDifficulty);
@@ -251,7 +283,7 @@ public class EchelonManager {
 
 				if (Math.abs(speedMultiplier) > 1.0E-7) {
 					AttributeModifier speedModifier = new AttributeModifier(
-							ECHELON_MOVEMENT_SPEED_MODIFIER,
+							ECHELON_FLYING_SPEED_MODIFIER,
 							speedMultiplier,
 							AttributeModifier.Operation.ADD_MULTIPLIED_BASE
 					);

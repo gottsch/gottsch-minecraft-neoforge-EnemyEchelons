@@ -17,12 +17,17 @@ package mod.gottsch.neoforge.eechelons.core.event;
 
 import mod.gottsch.neoforge.eechelons.EEchelonsApiMod;
 import mod.gottsch.neoforge.eechelons.api.EnemyEchelonsApi;
+import mod.gottsch.neoforge.eechelons.core.command.EchelonsCommand;
 import mod.gottsch.neoforge.eechelons.core.config.EchelonConfigsHolder;
+import mod.gottsch.neoforge.eechelons.core.data.EchelonDataLoader;
+import mod.gottsch.neoforge.eechelons.core.data.EchelonDataReloadListener;
 import mod.gottsch.neoforge.eechelons.core.echelon.EchelonManager;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.living.LivingExperienceDropEvent;
 
 import java.util.Optional;
@@ -34,6 +39,32 @@ import java.util.Optional;
  */
 @EventBusSubscriber(modid = EEchelonsApiMod.MODID, bus = EventBusSubscriber.Bus.GAME)
 public class WorldEventHandler {
+
+	/**
+	 * Loads the datapack echelon configs, exclusions and difficulty names on server start and /reload.
+	 * Mobs that have already spawned keep their difficulty; a reload only affects new spawns.
+	 * @param event The event.
+	 */
+	// PORT-CHECK: AddReloadListenerEvent is net.neoforged.neoforge.event.AddReloadListenerEvent in 21.1, with
+	// addListener(PreparableReloadListener). Confirm it fires on the GAME bus and on /reload.
+	@SubscribeEvent
+	public static void onAddReloadListeners(AddReloadListenerEvent event) {
+		event.addListener(new EchelonDataReloadListener(EchelonDataLoader.ECHELONS_DIRECTORY,
+				files -> EchelonDataLoader.applyEchelonConfigs(EchelonManager.REGISTRY, files)));
+		event.addListener(new EchelonDataReloadListener(EchelonDataLoader.EXCLUSIONS_DIRECTORY,
+				files -> EchelonDataLoader.applyExclusions(EchelonManager.REGISTRY, files)));
+		event.addListener(new EchelonDataReloadListener(EchelonDataLoader.DIFFICULTY_NAMES_DIRECTORY,
+				EchelonDataLoader::applyNameConfigs));
+	}
+
+	/**
+	 * Registers /eechelons dump.
+	 * @param event The event.
+	 */
+	@SubscribeEvent
+	public static void onRegisterCommands(RegisterCommandsEvent event) {
+		EchelonsCommand.register(event.getDispatcher());
+	}
 
 	/**
 	 * Handles the LivingExperienceDropEvent to modify XP based on Echelon.
